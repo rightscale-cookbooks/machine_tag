@@ -1,0 +1,19 @@
+.vagrant
+Berksfile.lock
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+/cookbooks
+
+# Bundler
+Gemfile.lock
+bin/*
+.bundle/*
+
+VERSION
+.kitchen/
+.kitchen.local.yml
+cache_dir/machine_tag_cache
