@@ -32,5 +32,3 @@ master_tags = all_tags.select { |tags| tags["test:master"] == "true" }.first
 Chef::Log.info master_tags.inspect
 raise "Did not find the master tag!" unless master_tags
 Chef::Log.info "Master IP is #{master_tags['test:master_ip']}"
-
-

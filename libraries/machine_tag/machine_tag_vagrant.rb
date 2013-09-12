@@ -1,4 +1,23 @@
-require "json"
+#
+# Cookbook Name:: machine_tag
+# Library:: machine_tag_vagrant
+#
+# Copyright (C) 2013 RightScale, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+require 'json'
 
 class Chef
   class MachineTagVagrant < MachineTagBase
@@ -25,7 +44,7 @@ class Chef
       create_tag_hash(list)
     end
 
-    def search(query=nil, args={})
+    def search(query = nil, args = {})
       t_array = []
       all_vm_tag_dirs.each do |tag_dir|
         tag_file = ::File.join(tag_dir, "tags.json")
@@ -36,9 +55,7 @@ class Chef
       t_array
     end
 
-
     private
-
 
     def initialize(box_name, cache_dir)
       @box_name = box_name
@@ -49,7 +66,6 @@ class Chef
     # These private methods are thanks to Ryan Geyer's work in his
     # rs_vagrant_shim project:
     #  https://github.com/rgeyer-rs-cookbooks/rs_vagrant_shim
-
 
     # Accesses the persist.json file in the shim directory of "this" VM.
     #

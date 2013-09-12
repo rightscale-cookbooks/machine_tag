@@ -1,7 +1,26 @@
+#
+# Cookbook Name:: machine_tag
+# Library:: machine_tag_base
+#
+# Copyright (C) 2013 RightScale, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 # TODO: investigate monkey-patching Chef::Search::Query to use `rs_tag` when
 #       querying node:tags
 #
-# TODO: needs to suppport :mandiatory_tags argument
+# TODO: needs to support :mandatory_tags argument
 #
 # class Chef
 #   class Search
@@ -30,7 +49,7 @@ class Chef
     end
 
     # Return the list of tags for all server that match the query
-    def search(query=nil, args={})
+    def search(query = nil, args = {})
       not_implemented
     end
 
