@@ -9,11 +9,11 @@ Vagrant.configure("2") do |config|
   #config.vm.hostname = "machine-tag-berkshelf"
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "RightImage_Ubuntu_12.04_x64_v13.5.0.1"
+  config.vm.box = "opscode-ubuntu-12.04"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "https://rightscale-vagrant.s3.amazonaws.com/virtualbox/ubuntu/12.04/RightImage_Ubuntu_12.04_x64_v13.5.0.1.box"
+  config.vm.box_url = "https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_provisionerless.box"
 
   # Assign this VM to a host-only network IP, allowing you to access it
   # via the IP. Host-only networks can talk to the host machine as well as
@@ -69,6 +69,8 @@ Vagrant.configure("2") do |config|
   # An array of symbols representing groups of cookbook described in the Vagrantfile
   # to skip installing and copying to Vagrant's shelf.
   # config.berkshelf.except = []
+
+  config.omnibus.chef_version = :latest
 
   # Master DB
   config.vm.define :master do |master|

@@ -18,7 +18,7 @@
 #
 
 require File.join(File.dirname(__FILE__), "..", "..", "libraries", "provider_machine_tag.rb")
-require "chef"
+require "chefspec"
 
 describe Chef::MachineTag do
 
@@ -37,7 +37,7 @@ describe Chef::MachineTag do
   it "creates a tag" do
     @new_resource = Chef::Resource::MachineTag.new(@tag)
     @provider = Chef::Provider::MachineTag.new(@new_resource, @run_context)
-    helper_stub = stub("helper", :create => true)
+    helper_stub = double("helper", :create => true)
     @provider.should_receive(:get_helper).and_return(helper_stub)
     @provider.load_current_resource
     helper_stub.should_receive(:create).and_return(true)
@@ -47,7 +47,7 @@ describe Chef::MachineTag do
   it "deletes a tag" do
     @new_resource = Chef::Resource::MachineTag.new(@tag)
     @provider = Chef::Provider::MachineTag.new(@new_resource, @run_context)
-    helper_stub = stub("helper", :delete => true)
+    helper_stub = double("helper", :delete => true)
     @provider.should_receive(:get_helper).and_return(helper_stub)
     @provider.load_current_resource
     helper_stub.should_receive(:delete).and_return(true)
