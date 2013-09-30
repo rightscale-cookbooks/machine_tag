@@ -44,7 +44,7 @@ class Chef
       create_tag_hash(list)
     end
 
-    def search(query = nil, args = {})
+    def search(query, options = {})
       t_array = []
       all_vm_tag_dirs.each do |tag_dir|
         tag_file = ::File.join(tag_dir, "tags.json")

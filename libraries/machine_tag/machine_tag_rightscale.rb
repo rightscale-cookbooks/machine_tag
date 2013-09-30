@@ -29,7 +29,7 @@ class Chef
       run_rs_tag_util("--add #{tag}")
     end
 
-    def search(query = nil, args = {})
+    def search(query, options = {})
       stdout = run_rs_tag_util("--query #{query}")
       t_hash = JSON.parse(stdout)
       t_array = []
@@ -44,17 +44,6 @@ class Chef
     end
 
     private
-
-    # Break up tags into key, value pairs
-    # where the key contains "namespace:predicate"
-    def create_tag_hash(tags_array)
-      t_hash = {}
-      tags_array.each do |tag|
-        namespace_predicate, value = tag.split('=')
-        t_hash[namespace_predicate] = value
-      end
-      t_hash
-    end
 
     # make sure the `rs_tag` utility is in our path
     def assert_rightscale

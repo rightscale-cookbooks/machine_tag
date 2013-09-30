@@ -17,39 +17,42 @@
 # limitations under the License.
 #
 
-# TODO: investigate monkey-patching Chef::Search::Query to use `rs_tag` when
-#       querying node:tags
-#
-# TODO: needs to support :mandatory_tags argument
-#
-# class Chef
-#   class Search
-#     class Query
-
-#     end
-#   end
-# end
-
 class Chef
   class MachineTagBase
 
-    # create a tag for this server
+    # Create a tag for this server
+    #
+    # @param tag [String] the tag to create
+    #
     def create(tag)
       not_implemented
     end
 
-    # delete a tag for this server
+    # Delete a tag for this server
+    #
+    # @param tag [String] the tag to delete
+    #
     def delete(tag)
       not_implemented
     end
 
     # List all the tags for this server
+    #
+      # @return [Array<String>]
+    #
     def list
       not_implemented
     end
 
     # Return the list of tags for all server that match the query
-    def search(query = nil, args = {})
+    #
+    # @param query [String]
+    #
+    # @option options [Array<String>] :required_tags
+    #
+    # @return [Array<
+    #
+    def search(query, options = {})
       not_implemented
     end
 
