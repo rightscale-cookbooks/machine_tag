@@ -9,11 +9,23 @@ Server also.
 
 For Vagrant environments you will need the following installed:
 
- * Vagrant 1.1+
+ * Vagrant 1.2+
  * Bundler
 
-You must also set a unique hostname for each VM in your Vagrantfile. To set this use the `config.vm.host_name`
-configuration key:
+You must also install all the vagrant plugins listed in `plugins.json`. To manage these plugins, install
+a vagrant plugin called `bindler`.
+
+```
+vagrant plugin install bindler
+```
+
+To setup all the dependent vagrant plugins for this project using `bindler`, run
+
+```
+vagrant bindler setup
+```
+
+Set a unique hostname for each VM in your Vagrantfile. To set this use the `config.vm.host_name` configuration key:
 
 ```ruby
 master.vm.host_name = "master"
@@ -42,7 +54,7 @@ end
 
 ## tag_search(node, query, args)
 
-Returns and array of tag hashes for all servers in your environment. Currently the `query` and `args` parameters are not
+Returns an array of tag hashes for all servers in your environment. Currently the `query` and `args` parameters are not
 used. See `recipes/test_producer.rb` and `recipes/test_consumer.rb` for an example.
 
 ## tag_list(node)

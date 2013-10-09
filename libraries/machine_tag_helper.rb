@@ -24,17 +24,17 @@ require File.join(File.dirname(__FILE__), "machine_tag", "machine_tag_vagrant.rb
 class Chef
   class MachineTag
 
-    # factory method for instantiating the correct machine tag class
-    # base on hints from the chef node
+    # Factory method for instantiating the correct machine tag class based on `node[:cloud][:provider]`
+    # value. On vagrant environments, the node[:cloud][:provider] will be set to 'vagrant' when the
+    # vagrant-ohai plugin is installed.
     def self.factory(node)
-      # TODO: find a better way to detect operating environment
-      if node.has_key?('rightscale')
-        Chef::MachineTagRightscale.new
-      elsif node.has_key?('vagrant')
+      if node[:cloud].nil? || node[:cloud][:provider].nil?
+        raise "ERROR: could not detect a supported machine tag environment."
+      elsif node[:cloud][:provider] == 'vagrant'
         box_name, cache_dir = vagrant_params_from_node(node)
         Chef::MachineTagVagrant.new(box_name, cache_dir)
       else
-        raise "ERROR: could not detect a supported machine tag environment."
+        Chef::MachineTagRightscale.new
       end
     end
 
