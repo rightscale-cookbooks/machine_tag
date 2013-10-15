@@ -21,6 +21,7 @@ require 'json'
 
 class Chef
   class MachineTagVagrant < MachineTagBase
+    TAGS_JSON_FILE = 'tags.json'
 
     def create(tag)
       read_write_my_persist_file do |tag_array|
@@ -44,15 +45,24 @@ class Chef
       create_tag_hash(list)
     end
 
-    def search(query, options = {})
-      t_array = []
+    def query(query_string, options = {})
+      query_result = []
+
+      # Query all VMs for the tags
       all_vm_tag_dirs.each do |tag_dir|
-        tag_file = ::File.join(tag_dir, "tags.json")
+        tag_file = ::File.join(tag_dir, TAGS_JSON_FILE)
         tag_array = read_tag_file(tag_file)
-        # TODO: right now returns all tags for all VMs.  Need to filter based on query
-        t_array << create_tag_hash(tag_array) if tag_array
+        if tag_array
+          t_array = []
+          t_array << create_tag_hash(tag_array)
+
+          # Select the VM if any of the tags in the query are found in the hash
+          query_string.split(' ').each do |queried_tag|
+            query_result += t_array if detect_tag(t_array, queried_tag)
+          end
+        end
       end
-      t_array
+      query_result
     end
 
     private
@@ -60,7 +70,7 @@ class Chef
     def initialize(box_name, cache_dir)
       @box_name = box_name
       @cache_dir = ::File.join(cache_dir, "#{@box_name}")
-      @tag_file = ::File.join(@cache_dir, "tags.json")
+      @tag_file = ::File.join(@cache_dir, TAGS_JSON_FILE)
     end
 
     # These private methods are thanks to Ryan Geyer's work in his
@@ -104,13 +114,6 @@ class Chef
         file.write(JSON.pretty_generate(tag_hash))
       end
       true
-    end
-
-    # Lists all directories that are in the same directory as the shim directory
-    # for "this" VM.  Excludes "this" VM
-    #
-    def other_vm_tag_dirs
-      all_vm_tag_dirs.select{|dir| dir != @cache_dir}
     end
 
     def all_vm_tag_dirs
