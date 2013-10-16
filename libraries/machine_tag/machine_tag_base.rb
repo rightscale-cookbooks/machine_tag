@@ -44,6 +44,12 @@ class Chef
       not_implemented
     end
 
+    # Queries the tags passed through the query string.
+    #
+    # @param query_string [String] the tags to be queried separated by blank space
+    #
+    # @return [Array<Hash>] the list of all tags on the servers that match the query
+    #
     def query(query_string = '')
       not_implemented
     end
@@ -57,42 +63,47 @@ class Chef
     # If the tags are not found at the time of the query, re-query until they are found or the timeout is reached
     # @option options [Integer] :query_timeout the timeout for the query operation
     #
-    # @return [Array<String>] the list of tags found
+    # @return [Array<Hash>] the array of all tags (in hash format) on the servers
+    # that match the query
+    #
+    # @raise [Timeout::Error] if the required tags could not be found within the time
     #
     def search(query_string, options = {})
       if options[:required_tags].nil? || options[:required_tags].empty?
-        query(query_string)
+        return query(query_string)
       else
-        t_array = query(query_string)
+        tags_hash_array = query(query_string)
 
-        # Set timeout for querying for required_tags
+        # Set timeout for querying for required_tags. By default the timeout is set
+        # for 120 seconds if no timeouts specified.
         timeout_sec = options[:query_timeout] ? options[:query_timeout] * 60 : 120
         begin
           Timeout::timeout(timeout_sec) do
             options[:required_tags].each do |tag|
               sleep_sec = 1
               # Check if the tag is found in all the servers in the query result. If not, re-query
-              while detect_tag(t_array, tag).length != t_array.length
+              while detect_tag(tags_hash_array, tag).length != tags_hash_array.length
                 # Calculate wait interval for re-querying
                 sleep_sec = sleep_interval(sleep_sec)
                 Chef::Log.info "Requested tags are not available yet. Waiting for #{sleep_sec} seconds..."
                 sleep sleep_sec
                 Chef::Log.info "Re-querying for the requested tags..."
                 # Re-query the tags
-                t_array = query(query_string)
+                tags_hash_array = query(query_string)
               end
             end
           end
         rescue Timeout::Error => e
           raise e, "Requested tags could not be found within #{timeout_sec} seconds"
         end
-        t_array
+        return tags_hash_array
       end
     end
 
     private
 
-    # Use the MachineTag.factory method to create this class
+    # Use the MachineTag.factory method to create this class.
+    #
     def initalize; end
 
     # Breaks up tags into <key, value> pairs where the key contains
@@ -111,12 +122,22 @@ class Chef
       t_hash
     end
 
+    # Checks if a tag exists in the array of tag hashes.
+    #
+    # @param tags_hash_array [Array<Hash>] the array of tag hashes to be looked up
+    # @param tag [String] the tag to search
+    #
+    # @return [Array] the array of tag hashes that contains the tag, otherwise
+    # empty array if tag does not exist
+    #
+    # @raise [RuntimeError] if the queried tag is not a valid query
+    #
     def detect_tag(tags_hash_array, tag)
-      raise "#{tag} is not a valid tag!" unless valid_tag?(tag)
+      raise "#{tag} is not a valid tag query!" unless valid_tag_query?(tag)
 
       key, value = tag.split('=')
       tags_hash_array.select do |tags_hash|
-        # If tag value is a wildcard, detect tags that match the namespace:predicate (key)
+        # If tag value is a wildcard, select tags that match the namespace:predicate (key)
         # else, detect tags that match both namespace:predicate and the value
         if value == '*' || value.nil?
           tags_hash.keys.include?(key)
@@ -126,10 +147,24 @@ class Chef
       end
     end
 
-    def valid_tag?(tag)
-      tag =~ /^[a-zA-Z][a-zA-Z0-9_]*:[a-zA-Z][a-zA-Z0-9_]*(=(\*|.+))?/
+    # Validates the tag passed into the query.
+    #
+    # @see http://support.rightscale.com/12-Guides/RightLink/01-RightLink_Overview/RightLink_Command_Line_Utilities#rs_tag
+    #
+    # @return [Boolean] true if the tag query is valid, false otherwise
+    #
+    def valid_tag_query?(tag)
+      tag =~ /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|.+))?/ ? true : false
     end
 
+    # Calculates the interval for re-querying tags. For every re-query the interval
+    # is increased exponentially until the interval reaches the maximum limit of
+    # 60 seconds.
+    #
+    # @param delay [Integer] the current sleep interval
+    #
+    # @return [Integer] the new sleep interval
+    #
     def sleep_interval(delay = 1)
       max_sleep_interval = 60
       if delay == 1
@@ -142,10 +177,13 @@ class Chef
       end
     end
 
+    # Raises an error if the method called is not implemented in the class.
+    #
+    # @raise [NotImplementedError] if the method call is not implemented
+    #
     def not_implemented
       caller[0] =~ /`(.*?)'/
       raise NotImplementedError, "#{$1} is not implemented on #{self.class}"
     end
-
   end
 end

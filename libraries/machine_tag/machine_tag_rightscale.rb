@@ -25,26 +25,39 @@ class Chef
 
     include Chef::Mixin::ShellOut
 
+    # Creates a tag on the server.
+    #
     def create(tag)
       run_rs_tag_util("--add #{tag}")
     end
 
+    # Deletes a tag from the server.
+    #
     def delete(tag)
       run_rs_tag_util("--remove #{tag}")
     end
 
+    # Lists all tags on the server.
+    #
+    # @return [Hash] the tags on the server
+    #
     def list
       create_tag_hash(run_rs_tag_util)
     end
 
+    # Searches for the given tags on the servers.
+    #
+    # @param query_string [String] the tags to be queried separated by a blank space
+    #
+    # @return [Array<Hash>] the tags on the servers that match the query
+    #
     def query(query_string)
-      stdout = run_rs_tag_util("--query #{query_string}")
-      tags_hash = JSON.parse(stdout)
-      t_array = []
+      tags_hash = JSON.parse(run_rs_tag_util("--query #{query_string}"))
+      tags_hash_array = []
       tags_hash.keys.each do |key|
-        t_array << create_tag_hash(tags_hash[key]["tags"]) if tags_hash[key]["tags"]
+        tags_hash_array << create_tag_hash(tags_hash[key]['tags']) if tags_hash[key]['tags']
       end
-      t_array
+      tags_hash_array
     end
 
     private

@@ -38,8 +38,8 @@ class Chef
         raise "ERROR: could not detect a supported machine tag environment."
       elsif node[:cloud][:provider] == 'vagrant'
         # This is a vagrant environment
-        box_name, cache_dir = vagrant_params_from_node(node)
-        Chef::MachineTagVagrant.new(box_name, cache_dir)
+        hostname, cache_dir = vagrant_params_from_node(node)
+        Chef::MachineTagVagrant.new(hostname, cache_dir)
       else
         # This is a RightScale environment
         Chef::MachineTagRightscale.new
@@ -53,10 +53,9 @@ class Chef
 
     # Harvest vagrant parameters from the chef node.
     def self.vagrant_params_from_node(node)
-      # Verify box_name
-      box_name = node['vagrant']['box_name']
-      err_msg = "ERROR: node['vagrant']['box_name'] not defined. " + readme_info
-      arg_error(err_msg) unless box_name
+      hostname = node['hostname']
+      err_msg = "ERROR: node['hostname'] not defined. " + readme_info
+      arg_error(err_msg) unless hostname
 
       # Verify machine_tag hash
       err_msg = "ERROR: node['machine_tag'] hash not defined. " + readme_info
@@ -67,7 +66,7 @@ class Chef
       err_msg = "ERROR: node['machine_tag']['vagrant_tag_cache_dir'] not defined. " + readme_info
       arg_error(err_msg) unless cache_dir
 
-      return box_name, cache_dir
+      return hostname, cache_dir
     end
 
     def self.readme_info

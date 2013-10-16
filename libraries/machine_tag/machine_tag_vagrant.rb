@@ -23,42 +23,64 @@ class Chef
   class MachineTagVagrant < MachineTagBase
     TAGS_JSON_FILE = 'tags.json'
 
+    # Creates a tag on the VM by adding the tag to its tags cache file
+    # if it does not exist.
+    #
+    # @return [Boolean] true if the tag is successfully added to the tag cache
+    #
     def create(tag)
-      read_write_my_persist_file do |tag_array|
-        tag_array << tag unless tag_array.include? tag
+      update_tag_file do |tag_array|
+        tag_array << tag unless tag_array.include?(tag)
       end
       true
     end
 
+    # Deletes a tag on the VM by removing the tag from the tags cache file.
+    #
+    # @return [Boolean] if the tag is successfully deleted from the tag cache
+    #
     def delete(tag)
-      read_write_my_persist_file do |tag_array|
+      update_tag_file do |tag_array|
         tag_array.delete(tag)
       end
       true
     end
 
+    # Gets the tags on the VM by reading the contents of the tags cache file.
+    #
+    # @return [Hash] the tags on the VM
+    #
     def list
-      list = nil
-      read_write_my_persist_file do |tag_array|
-        list = tag_array
-      end
-      create_tag_hash(list)
+      create_tag_hash(read_tag_file(@tag_file))
     end
 
-    def query(query_string, options = {})
+    # Searches for the given tags in the tags cache file on all the VMs.
+    #
+    # @param query_string [String] the tags to be queried separated by a blank space
+    #
+    # @return [Array<Hash>] the tags on the VMs that match the query
+    #
+    def query(query_string)
       query_result = []
+      query_tags = query_string.split(' ')
+
+      # Return empty array if no tags are found in the query string
+      return query_result if query_tags.empty?
 
       # Query all VMs for the tags
       all_vm_tag_dirs.each do |tag_dir|
-        tag_file = ::File.join(tag_dir, TAGS_JSON_FILE)
-        tag_array = read_tag_file(tag_file)
-        if tag_array
-          t_array = []
-          t_array << create_tag_hash(tag_array)
+        tags_array = read_tag_file(::File.join(tag_dir, TAGS_JSON_FILE))
+        if tags_array
+          tags_hash_array = []
+          tags_hash_array << create_tag_hash(tags_array)
 
-          # Select the VM if any of the tags in the query are found in the hash
-          query_string.split(' ').each do |queried_tag|
-            query_result += t_array if detect_tag(t_array, queried_tag)
+          # If at least one of the tags in the query is found in the VM
+          # select the VM
+          query_tags.each do |tag|
+            unless detect_tag(tags_hash_array, tag).empty?
+              query_result += tags_hash_array
+              break
+            end
           end
         end
       end
@@ -67,9 +89,9 @@ class Chef
 
     private
 
-    def initialize(box_name, cache_dir)
-      @box_name = box_name
-      @cache_dir = ::File.join(cache_dir, "#{@box_name}")
+    def initialize(hostname, cache_dir)
+      @hostname = hostname
+      @cache_dir = ::File.join(cache_dir, @hostname)
       @tag_file = ::File.join(@cache_dir, TAGS_JSON_FILE)
     end
 
@@ -77,27 +99,27 @@ class Chef
     # rs_vagrant_shim project:
     #  https://github.com/rgeyer-rs-cookbooks/rs_vagrant_shim
 
-    # Accesses the persist.json file in the shim directory of "this" VM.
+    # Updates the contents of the tag file.
     #
-    # Expects to be passed a block which will have a hash yielded to it.  That hash
-    # will represent the current contents of the persist.json file.  When the block
-    # returns, any changes to the hash will be written back to the persist.json file
-    def read_write_my_persist_file
+    def update_tag_file
       make_cache_dir
       begin
-        tag_hash = read_tag_file(@tag_file)
-        yield tag_hash
-        write_tag_file(tag_hash)
+        tag_array = read_tag_file(@tag_file)
+        yield tag_array
+        write_tag_file(tag_array)
       end
     end
 
+    # Creates tag cache directory in the VM.
+    #
     def make_cache_dir
       ::FileUtils.mkdir_p @cache_dir unless ::File.directory? @cache_dir
     end
 
-    # Reads the contents of json file into an array
+    # Reads the contents of json file into an array.
     #
-    # @return An array representing the contents of the file, or an empty Array if the file does not exist
+    # @return [Array] the file contents if file exists, an empty array otherwise
+    #
     def read_tag_file(filename)
       if ::File.exist? filename
         JSON.parse(::File.read(filename))
@@ -106,16 +128,21 @@ class Chef
       end
     end
 
-    # Writes the contents of tag array to a json file
+    # Writes the contents of tag array to a json file.
     #
-    # @return true
-    def write_tag_file(tag_hash)
+    # @return [Boolean] true if file successfully written
+    #
+    def write_tag_file(tag_array)
       ::File.open(@tag_file, 'w') do |file|
-        file.write(JSON.pretty_generate(tag_hash))
+        file.write(JSON.pretty_generate(tag_array))
       end
       true
     end
 
+    # Gets all the VM tag cache directories.
+    #
+    # @return [Array] the VM tag cache directories
+    #
     def all_vm_tag_dirs
       path_for_glob = ::File.expand_path(::File.join(@cache_dir, '..') + '/*')
       Dir.glob(path_for_glob)

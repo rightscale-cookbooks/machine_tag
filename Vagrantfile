@@ -89,9 +89,6 @@ Vagrant.configure("2") do |config|
         'rs-db' => {
           'application' => { 'password' => 'apppass' }
         },
-        'vagrant' => {
-          'box_name' => 'master'
-        }
       }
       chef.run_list = [
           "recipe[machine_tag::test_producer]"
@@ -116,9 +113,6 @@ Vagrant.configure("2") do |config|
         'rs-db' => {
           'application' => { 'password' => 'apppass' }
         },
-        'vagrant' => {
-          'box_name' => 'slave'
-        }
       }
       chef.run_list = [
           "recipe[machine_tag::test_consumer]",
