@@ -35,11 +35,15 @@ class Chef
       end
 
       def action_create
-        @tag_helper.create(new_resource.name)
+        status = @tag_helper.create(new_resource.name)
+        Chef::Log.info "Created tag '#{new_resource.name}'"
+        new_resource.updated_by_last_action(true)
       end
 
       def action_delete
-        @tag_helper.delete(new_resource.name)
+        status = @tag_helper.delete(new_resource.name)
+        Chef::Log.info "Deleted tag '#{new_resource.name}'"
+        new_resource.updated_by_last_action(true)
       end
 
       private

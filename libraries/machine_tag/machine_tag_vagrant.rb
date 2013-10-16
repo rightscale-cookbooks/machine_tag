@@ -113,7 +113,7 @@ class Chef
     # Creates tag cache directory in the VM.
     #
     def make_cache_dir
-      ::FileUtils.mkdir_p @cache_dir unless ::File.directory? @cache_dir
+      ::FileUtils.mkdir_p(@cache_dir) unless ::File.directory?(@cache_dir)
     end
 
     # Reads the contents of json file into an array.
@@ -121,7 +121,7 @@ class Chef
     # @return [Array] the file contents if file exists, an empty array otherwise
     #
     def read_tag_file(filename)
-      if ::File.exist? filename
+      if ::File.exist?(filename)
         JSON.parse(::File.read(filename))
       else
         []
@@ -147,6 +147,5 @@ class Chef
       path_for_glob = ::File.expand_path(::File.join(@cache_dir, '..') + '/*')
       Dir.glob(path_for_glob)
     end
-
   end
 end
