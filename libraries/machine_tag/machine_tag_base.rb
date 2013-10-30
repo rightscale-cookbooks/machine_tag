@@ -20,6 +20,14 @@
 class Chef
   class MachineTagBase
 
+    # Default query timeout (in seconds).
+    #
+    DEFAULT_QUERY_TIMEOUT = 120
+
+    # Maximum value for sleep interval (in seconds) when re-querying tags.
+    #
+    MAX_SLEEP_INTERVAL = 60
+
     # Creates a tag for this server.
     #
     # @param tag [String] the tag to create
@@ -76,7 +84,12 @@ class Chef
 
         # Set timeout for querying for required_tags. By default the timeout is set
         # for 120 seconds if no timeouts specified.
-        timeout_sec = options[:query_timeout] ? options[:query_timeout] * 60 : 120
+        timeout_sec = if options[:query_timeout]
+          options[:query_timeout] * 60
+        else
+          DEFAULT_QUERY_TIMEOUT
+        end
+
         begin
           Timeout::timeout(timeout_sec) do
             options[:required_tags].each do |tag|
@@ -87,8 +100,8 @@ class Chef
                 sleep_sec = sleep_interval(sleep_sec)
                 Chef::Log.info "Requested tags are not available yet. Waiting for #{sleep_sec} seconds..."
                 sleep sleep_sec
+
                 Chef::Log.info "Re-querying for the requested tags..."
-                # Re-query the tags
                 tags_hash_array = query(query_string)
               end
             end
@@ -116,10 +129,24 @@ class Chef
     def create_tag_hash(tags_array)
       t_hash = {}
       tags_array.each do |tag|
-        namespace_predicate, value = tag.split('=')
+        # If there are more than one '=' sign in 'value, split the tag on the
+        # first '=' sign
+        namespace_predicate, value = split_tag(tag)
         t_hash[namespace_predicate] = value
       end
       t_hash
+    end
+
+    # Splits a tag into 'namespace:predicate' and 'value'.
+    #
+    # @param tag [String] the tag to be split
+    #
+    # @return [String] the 'namespace:predicate' and the 'value'
+    #
+    def split_tag(tag)
+      # If there are more than one '=' sign in 'value, split the tag on the
+      # first '=' sign
+      tag.split('=', 2)
     end
 
     # Checks if a tag exists in the array of tag hashes.
@@ -135,7 +162,7 @@ class Chef
     def detect_tag(tags_hash_array, tag)
       raise "#{tag} is not a valid tag query!" unless valid_tag_query?(tag)
 
-      key, value = tag.split('=')
+      key, value = split_tag(tag)
       tags_hash_array.select do |tags_hash|
         # If tag value is a wildcard, select tags that match the namespace:predicate (key)
         # else, detect tags that match both namespace:predicate and the value
@@ -154,27 +181,23 @@ class Chef
     # @return [Boolean] true if the tag query is valid, false otherwise
     #
     def valid_tag_query?(tag)
-      tag =~ /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|.+))?/ ? true : false
+      # See http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging
+      # for tag syntax rules.
+      #
+      tag =~ /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|.+[^*]))?$/
     end
 
     # Calculates the interval for re-querying tags. For every re-query the interval
     # is increased exponentially until the interval reaches the maximum limit of
-    # 60 seconds.
+    # MAX_SLEEP_INTERVAL.
     #
     # @param delay [Integer] the current sleep interval
     #
     # @return [Integer] the new sleep interval
     #
     def sleep_interval(delay = 1)
-      max_sleep_interval = 60
-      if delay == 1
-        return 2
-      elsif delay >= max_sleep_interval
-        return max_sleep_interval
-      else
-        interval = delay * delay
-        return interval < max_sleep_interval ? interval : max_sleep_interval
-      end
+      return 2 if delay == 1
+      [delay * delay, MAX_SLEEP_INTERVAL].min
     end
 
     # Raises an error if the method called is not implemented in the class.

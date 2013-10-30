@@ -3,8 +3,11 @@ source 'https://rubygems.org'
 gem 'berkshelf'
 gem 'thor-foodcritic'
 gem 'thor-scmversion'
-gem 'test-kitchen', '~> 1.0.0.beta.3', :group => :integration
-gem 'kitchen-vagrant', :group => :integration
+
+group :integration do
+  gem 'test-kitchen', '~> 1.0.0.beta.3'
+  gem 'kitchen-vagrant', :github => 'nitinmohan87/kitchen-vagrant'
+end
 
 group :test do
   gem 'chefspec', '~> 2.0.1'

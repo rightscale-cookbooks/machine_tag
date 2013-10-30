@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: machine_tag
-# Recipe:: test_tags
+# Recipe:: delete_tag
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -16,20 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include_recipe "fake::create_tag"
 
-# see libaries/machine_tag_helper.rb
-class Chef::Resource
-  include Chef::MachineTagHelper
-end
-
-# add a tag to myself
-machine_tag "test:slave=true"
-
-# now see if I can list my tags
-ruby_block "look for my tags" do
-  block do
-    my_tags = tag_list(node)
-    Chef::Log.info "My Tags: #{my_tags.inspect}"
-    raise "Did not find the my tag!" unless my_tags.has_key?("test:slave")
-  end
+machine_tag "test:tag=true" do
+  action :delete
 end

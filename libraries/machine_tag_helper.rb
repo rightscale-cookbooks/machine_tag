@@ -34,9 +34,9 @@ class Chef
     # the machine tag environment
     #
     def self.factory(node)
-      if node[:cloud].nil? || node[:cloud][:provider].nil?
+      if node['cloud'].nil? || node['cloud']['provider'].nil?
         raise "ERROR: could not detect a supported machine tag environment."
-      elsif node[:cloud][:provider] == 'vagrant'
+      elsif node['cloud']['provider'] == 'vagrant'
         # This is a vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
         Chef::MachineTagVagrant.new(hostname, cache_dir)

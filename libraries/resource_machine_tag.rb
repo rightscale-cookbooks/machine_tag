@@ -35,7 +35,8 @@ class Chef
         set_or_return(
           :name,
           arg,
-          :kind_of => String  #TODO: add regex validation
+          :kind_of => String,
+          :regex => /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|.+[^*]))?$/
         )
       end
 

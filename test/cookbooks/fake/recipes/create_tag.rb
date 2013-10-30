@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: machine_tag
-# Recipe:: test_producer
+# Recipe:: create_tag
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,9 +17,6 @@
 # limitations under the License.
 #
 
-ip_addr = node['cloud']['public_ips'][0] if node['cloud'] && node['cloud']['public_ips'] && node['cloud']['public_ips']
-ip_addr ||= node['ipaddress']
-
-machine_tag "test:master=true"
-machine_tag "test:master_ip=#{ip_addr}"
-machine_tag "test:master_hostname=#{node['hostname']}"
+machine_tag "test:tag=true" do
+  action :create
+end

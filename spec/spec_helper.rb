@@ -17,4 +17,13 @@
 # limitations under the License.
 #
 
-require File.join(File.dirname(__FILE__),"..","libraries","machine_tag_helper.rb")
+lib = File.expand_path('../../libraries', __FILE__)
+$:.unshift(lib) unless $:.include?(lib)
+
+require 'chefspec'
+require 'machine_tag_helper'
+require 'provider_machine_tag'
+require 'resource_machine_tag'
+require 'machine_tag/machine_tag_base'
+require 'machine_tag/machine_tag_vagrant'
+require 'machine_tag/machine_tag_rightscale'
