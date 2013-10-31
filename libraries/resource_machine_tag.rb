@@ -36,7 +36,7 @@ class Chef
           :name,
           arg,
           :kind_of => String,
-          :regex => /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|.+[^*]))?$/
+          :regex => /^[a-zA-Z]\w*:[a-zA-Z]\w*=(\*|[^*]+)$/
         )
       end
 

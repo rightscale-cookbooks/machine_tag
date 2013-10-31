@@ -17,12 +17,12 @@
 # limitations under the License.
 #
 
-require File.join(File.dirname(__FILE__), "..", "..", "spec_helper.rb")
+require 'spec_helper'
 
 describe Chef::MachineTagRightscale do
 
-  before(:all) do
-    RS_RAW_OUTPUT = '{
+  let(:rs_raw_output) do
+    '{
       "rs-instance-a3cd8e55f106f8c9edfcb84f7d786b19ee7baa46-7712524001": {
         "tags": [
           "database:active=true",
@@ -31,8 +31,7 @@ describe Chef::MachineTagRightscale do
           "rs_monitoring:state=active",
           "server:private_ip_0=10.100.0.12",
           "server:public_ip_0=157.56.165.202",
-          "server:uuid=01-83PJQDO8911IT",
-          "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
+          "server:uuid=01-83PJQDO8911IT"
         ]
       },
       "rs-instance-29ad5f04e6c298d9b7837b200c80429da8a3f0b5-7712573001": {
@@ -49,7 +48,10 @@ describe Chef::MachineTagRightscale do
         ]
       }
     }'
-    RS_LIST_RESULTS = '[
+  end
+
+  let(:rs_list_result) do
+   '[
       "appserver:active=true",
       "appserver:listen_ip=10.254.84.76",
       "appserver:listen_port=8000",
@@ -61,33 +63,42 @@ describe Chef::MachineTagRightscale do
     ]'
   end
 
-  describe "search" do
-    it "raises if rs_tag is not available" do
-      tag_helper = Chef::MachineTag.factory({"rightscale" => {}})
-      lambda{tag_helper.serach("server:private_ip_0")}.should raise_error
-    end
+  let(:node) do
+    node = Chef::Node.new
+    node.set['cloud']['provider'] = 'ec2'
+    node
+  end
 
-    it "returns an array of tag hashes" do
-      tag_helper =  Chef::MachineTag.factory({"rightscale" => {}})
-      tag_helper.should_receive(:run_rs_tag_util).and_return(RS_RAW_OUTPUT)
-      tags = tag_helper.search("server:private_ip_0")
-      tags.is_a?(Array).should == true
-      tags.first.is_a?(Hash).should == true
+  let(:tag_helper) { Chef::MachineTag.factory(node) }
+
+  describe "#create" do
+    it "should create a tag" do
+      tag_helper.should_receive(:run_rs_tag_util)
+      tag_helper.create('some:tag=true')
     end
   end
 
-end
+  describe "#delete" do
+    it "should delete a tag" do
+      tag_helper.should_receive(:run_rs_tag_util)
+      tag_helper.delete('some:tag=true')
+    end
+  end
 
-=begin
-$ sudo rs_tag --list
-[
-  "appserver:active=true",
-  "appserver:listen_ip=10.254.84.76",
-  "appserver:listen_port=8000",
-  "rs_login:state=restricted",
-  "rs_monitoring:state=active",
-  "server:private_ip_0=10.254.84.76",
-  "server:public_ip_0=54.214.187.99",
-  "server:uuid=01-6P781RDGU1F13"
-]
-=end
+  describe "#list" do
+    it "should list the tags in the server" do
+      tag_helper.should_receive(:run_rs_tag_util).and_return(rs_list_result)
+      tag_helper.list
+    end
+  end
+
+  describe "#query" do
+    it "should return array of tag hashes containing the query tag" do
+      tag_helper.should_receive(:run_rs_tag_util).and_return(rs_raw_output)
+
+      tags = tag_helper.query('')
+      tags.should be_a(Array)
+      tags.first.should be_a(Hash)
+    end
+  end
+end

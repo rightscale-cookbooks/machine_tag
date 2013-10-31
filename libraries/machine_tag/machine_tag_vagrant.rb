@@ -101,6 +101,8 @@ class Chef
 
     # Updates the contents of the tag file.
     #
+    # @param [Proc] the block to be executed before updating tag cache directory
+    #
     def update_tag_file
       make_cache_dir
       begin

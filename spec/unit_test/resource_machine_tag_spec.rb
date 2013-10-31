@@ -33,9 +33,9 @@ describe Chef::MachineTag do
       valid_tags = [
         'namespace:predicate=value',
         'namespace:predicate=*',
-        'Namespace:Predicate',
         'n_0abc123:xy_123=-1',
-        'naMesPacE:PrEdiCatE=value=value'
+        'naMesPacE:PrEdiCatE=value=value',
+        'server:something=1'
       ]
       valid_tags.each do |tag|
         resource.name(tag)

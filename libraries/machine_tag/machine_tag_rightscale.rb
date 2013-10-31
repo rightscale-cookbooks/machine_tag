@@ -42,7 +42,7 @@ class Chef
     # @return [Hash] the tags on the server
     #
     def list
-      create_tag_hash(run_rs_tag_util)
+      create_tag_hash(JSON.parse(run_rs_tag_util))
     end
 
     # Searches for the given tags on the servers.

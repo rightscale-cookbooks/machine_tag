@@ -184,7 +184,7 @@ class Chef
       # See http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging
       # for tag syntax rules.
       #
-      tag =~ /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|.+[^*]))?$/
+      tag =~ /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|[^*]+))?$/
     end
 
     # Calculates the interval for re-querying tags. For every re-query the interval
