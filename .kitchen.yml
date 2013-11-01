@@ -1,10 +1,8 @@
 ---
 driver_plugin: vagrant
 driver_config:
-  use_vagrant_provision: true
   use_vagrant_berkshelf_plugin: true
   require_chef_omnibus: true
-  use_vagrant_bindler_plugin: true
   log_file: /var/log/chef-solo.log
 
 platforms:
@@ -28,7 +26,11 @@ platforms:
 suites:
 - name: create
   run_list: ["recipe[fake::create_tag]"]
-  attributes: {}
-
+  attributes:
+    cloud:
+      provider: vagrant
 - name: delete
   run_list: ["recipe[fake::delete_tag]"]
+  attributes:
+    cloud:
+      provider: vagrant
