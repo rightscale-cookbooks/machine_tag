@@ -52,16 +52,6 @@ class Chef
       not_implemented
     end
 
-    # Queries the tags passed through the query string.
-    #
-    # @param query_string [String] the tags to be queried separated by blank space
-    #
-    # @return [Array<Hash{String => String}>] the list of all tags on the servers that match the query
-    #
-    def query(query_string = '')
-      not_implemented
-    end
-
     # Returns the list of tags for all server that match the query.
     #
     # @param query_string [String] the tags separated by space that should be queried
@@ -110,7 +100,8 @@ class Chef
 
     protected
 
-    # Queries the tags passed through the query string.
+    # Queries for a specific tag on all servers and returns all the tags on the servers
+    # that match the query.
     #
     # @param query_string [String] the tags to be queried separated by blank space
     #
@@ -149,7 +140,7 @@ class Chef
     # @return [String] the 'namespace:predicate' and the 'value'
     #
     def split_tag(tag)
-      # If there are more than one '=' sign in 'value, split the tag on the
+      # If there are more than one '=' sign in 'value', split the tag on the
       # first '=' sign
       tag.split('=', 2)
     end
@@ -183,6 +174,7 @@ class Chef
     # Validates the tag passed into the query.
     #
     # @see http://support.rightscale.com/12-Guides/RightLink/01-RightLink_Overview/RightLink_Command_Line_Utilities#rs_tag
+    #   rs_tag Command Line Utility
     #
     # @return [Boolean] true if the tag query is valid, false otherwise
     #
