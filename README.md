@@ -3,9 +3,9 @@
 [![Build Status](https://travis-ci.org/rightscale-cookbooks/machine_tag.png?branch=master)](https://travis-ci.org/rightscale-cookbooks/machine_tag)
 
 This cookbook provides a `machine_tag` resource that can create, delete, list, and
-search [machine tags][machine_tag_link] in the Vagrant and RightScale environments. 
+search [machine tags][Tagging] in the Vagrant and RightScale environments. 
 
-[machine_tag_link]: http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging)
+[Tagging]: http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging
 
 # Requirements
 
@@ -17,9 +17,10 @@ For using this resource in a *Vagrant environment* install the following
  * Bundler
  * Bindler
 
-[vagrant-ohai][vagrant-ohai_link] Vagrant plugin is used to differentiate between
-the Vagrant and RightScale environments. [Bindler][bindler_link] is used to manage
-Vagrant plugins required by this resource. See [Bindler README][bindler_link] on how to setup bindler.
+[Bindler][Bindler] is used to manage Vagrant plugins required by this resource.
+See [Bindler README][Bindler] on how to setup bindler.
+
+[Bindler]: https://github.com/fgrehm/bindler
 
 The Vagrant plugins required by this resource to work on a Vagrant environment
 is put inside `plugins.json` file in the root of the repository. Once Bindler is set
@@ -28,9 +29,6 @@ up, install these plugins by running
 ```
 vagrant plugin bundle
 ```
-
-[vagrant-ohai_link]: https://github.com/avishai-ish-shalom/vagrant-ohai
-[bindler_link]: https://github.com/fgrehm/bindler
 
 Set a unique hostname for each VM in your Vagrantfile. To set this use the
 `config.vm.host_name` configuration key:
@@ -43,9 +41,9 @@ See `Vagrantfile` for an example.
 ## RightScale Environment
 
 For using this resource in a *RightScale Environment*, the system must be a
-RightScale managed VM to have the required access to the [rs_tag utility][rs_tag_util_link].
+RightScale managed VM to have the required access to the [rs_tag utility][rs_tag].
 
-[rs_tag_util_link]: http://support.rightscale.com/12-Guides/RightLink/01-RightLink_Overview/RightLink_Command_Line_Utilities#rs_tag
+[rs_tag]: http://support.rightscale.com/12-Guides/RightLink/01-RightLink_Overview/RightLink_Command_Line_Utilities#rs_tag
 
 
 # Resource/Provider

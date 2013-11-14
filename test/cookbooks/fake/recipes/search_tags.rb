@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: machine_tag
-# Recipe:: create_tag
+# Cookbook Name:: fake
+# Recipe:: search_tags
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,6 +17,15 @@
 # limitations under the License.
 #
 
-machine_tag "test:tag=true" do
-  action :create
+class Chef::Resource::RubyBlock
+  include Chef::MachineTagHelper
+end
+
+ruby_block "searching master tags" do
+  block do
+    master_tags = tag_search(node, "master:ip").first
+    Chef::Log.info "Master IP: " + master_tags["master:ip"]
+    Chef::Log.info "Master Hostname: " + master_tags["master:hostname"]
+    Chef::Log.info "Master Login State: " + master_tags["master:login"]
+  end
 end

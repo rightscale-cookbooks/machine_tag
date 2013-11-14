@@ -19,17 +19,14 @@
 
 require "spec_helper"
 
-describe Chef::MachineTag do
+describe Chef::Resource::MachineTag do
   let(:resource) { Chef::Resource::MachineTag.new('machine_tag', run_context) }
   let(:events) { Chef::EventDispatch::Dispatcher.new }
   let(:run_context) { Chef::RunContext.new(node, {}, events) }
   let(:node) { Chef::Node.new }
 
-  # See http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging
-  # for tag syntax rules.
-  #
   context "tag syntax is valid" do
-    it "has an name attribute to set the name of the tag" do
+    it "has a name attribute to set the name of the tag" do
       valid_tags = [
         'namespace:predicate=value',
         'namespace:predicate=*',
@@ -54,9 +51,9 @@ describe Chef::MachineTag do
         'n- :blah =!'
       ]
       invalid_tags.each do |tag|
-        expect {
+        expect do
           resource.name(tag)
-        }.to raise_error
+        end.to raise_error(Chef::Exceptions::ValidationFailed)
       end
     end
   end

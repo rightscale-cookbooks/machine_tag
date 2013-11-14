@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: machine_tag
-# Spec:: spec_helper
+# Cookbook Name:: fake
+# Recipe:: delete_tags
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,10 +17,6 @@
 # limitations under the License.
 #
 
-lib = File.expand_path('../../libraries', __FILE__)
-$:.unshift(lib) unless $:.include?(lib)
-
-require 'chefspec'
-require 'machine_tag_helper'
-require 'provider_machine_tag'
-require 'resource_machine_tag'
+machine_tag "master:login=restricted" do
+  action :delete
+end

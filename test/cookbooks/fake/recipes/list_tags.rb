@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: machine_tag
-# Recipe:: delete_tag
+# Cookbook Name:: fake
+# Recipe:: list_tags
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -21,21 +21,9 @@ class Chef::Resource::RubyBlock
   include Chef::MachineTagHelper
 end
 
-machine_tag "test:tag1=true" do
-  action :create
-end
-
-machine_tag "test:tag2=true" do
-  action :create
-end
-
-machine_tag "test:tag3=true" do
-  action :create
-end
-
-ruby_block "listing tags" do
+ruby_block "listing master tags" do
   block do
     tags_list = tag_list(node)
-    puts tags_list.inspect
+    Chef::Log.info tags_list.inspect
   end
 end

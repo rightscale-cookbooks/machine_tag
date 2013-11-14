@@ -20,11 +20,11 @@
 class Chef
   class MachineTagBase
 
-    # Default query timeout (in seconds).
+    # Default query timeout (in seconds)
     #
     DEFAULT_QUERY_TIMEOUT = 120
 
-    # Maximum value for sleep interval (in seconds) when re-querying tags.
+    # Maximum value for sleep interval (in seconds) when re-querying tags
     #
     MAX_SLEEP_INTERVAL = 60
 
@@ -46,7 +46,7 @@ class Chef
 
     # Lists all the tags for this server.
     #
-    # @return [Hash] the list of tags
+    # @return [Hash{String => String}] the list of tags
     #
     def list
       not_implemented
@@ -56,7 +56,7 @@ class Chef
     #
     # @param query_string [String] the tags to be queried separated by blank space
     #
-    # @return [Array<Hash>] the list of all tags on the servers that match the query
+    # @return [Array<Hash{String => String}>] the list of all tags on the servers that match the query
     #
     def query(query_string = '')
       not_implemented
@@ -65,30 +65,24 @@ class Chef
     # Returns the list of tags for all server that match the query.
     #
     # @param query_string [String] the tags separated by space that should be queried
-    # @param options [Hash] the optional parameters for the query
+    # @param options [Hash{String => String, Integer}] the optional parameters for the query
     #
     # @option options [Array<String>] :required_tags the tags that should be found by the query.
     # If the tags are not found at the time of the query, re-query until they are found or the timeout is reached
     # @option options [Integer] :query_timeout the timeout for the query operation
     #
-    # @return [Array<Hash>] the array of all tags (in hash format) on the servers
-    # that match the query
+    # @return [Array<Hash{String => String}>] the array of all tags (in hash format)
+    # on the servers that match the query
     #
     # @raise [Timeout::Error] if the required tags could not be found within the time
     #
     def search(query_string, options = {})
-      if options[:required_tags].nil? || options[:required_tags].empty?
-        return query(query_string)
-      else
-        tags_hash_array = query(query_string)
+      tags_hash_array = do_query(query_string)
 
-        # Set timeout for querying for required_tags. By default the timeout is set
+      unless options[:required_tags].nil? || options[:required_tags].empty?
+        # Set timeout for querying for required_tags. By default, the timeout is set
         # for 120 seconds if no timeouts specified.
-        timeout_sec = if options[:query_timeout]
-          options[:query_timeout] * 60
-        else
-          DEFAULT_QUERY_TIMEOUT
-        end
+        timeout_sec = options[:query_timeout] ? options[:query_timeout].to_i * 60 : DEFAULT_QUERY_TIMEOUT
 
         begin
           Timeout::timeout(timeout_sec) do
@@ -98,19 +92,32 @@ class Chef
               while detect_tag(tags_hash_array, tag).length != tags_hash_array.length
                 # Calculate wait interval for re-querying
                 sleep_sec = sleep_interval(sleep_sec)
-                Chef::Log.info "Requested tags are not available yet. Waiting for #{sleep_sec} seconds..."
+                Chef::Log.info "'#{tag}' is not available yet. Waiting for #{sleep_sec} seconds..."
                 sleep sleep_sec
 
-                Chef::Log.info "Re-querying for the requested tags..."
-                tags_hash_array = query(query_string)
+                Chef::Log.info "Re-querying for '#{tag}'..."
+                tags_hash_array = do_query(query_string)
               end
             end
           end
         rescue Timeout::Error => e
           raise e, "Requested tags could not be found within #{timeout_sec} seconds"
         end
-        return tags_hash_array
       end
+      tags_hash_array
+    end
+
+
+    protected
+
+    # Queries the tags passed through the query string.
+    #
+    # @param query_string [String] the tags to be queried separated by blank space
+    #
+    # @return [Array<Hash{String => String}>] the list of all tags on the servers that match the query
+    #
+    def do_query(query_string = '')
+      not_implemented
     end
 
     private
@@ -124,17 +131,15 @@ class Chef
     #
     # @param tags_array [Array<String>] the array of tags
     #
-    # @return [Hash] the tag hash
+    # @return [Hash{String => String}] the tag hash
     #
     def create_tag_hash(tags_array)
-      t_hash = {}
+      tags_hash = {}
       tags_array.each do |tag|
-        # If there are more than one '=' sign in 'value, split the tag on the
-        # first '=' sign
         namespace_predicate, value = split_tag(tag)
-        t_hash[namespace_predicate] = value
+        tags_hash[namespace_predicate] = value
       end
-      t_hash
+      tags_hash
     end
 
     # Splits a tag into 'namespace:predicate' and 'value'.
@@ -151,7 +156,8 @@ class Chef
 
     # Checks if a tag exists in the array of tag hashes.
     #
-    # @param tags_hash_array [Array<Hash>] the array of tag hashes to be looked up
+    # @param tags_hash_array [Array<Hash{String => String}>] the array of tag hashes
+    # to be looked up
     # @param tag [String] the tag to search
     #
     # @return [Array] the array of tag hashes that contains the tag, otherwise
@@ -184,21 +190,22 @@ class Chef
       # See http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging
       # for tag syntax rules.
       #
-      tag =~ /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|[^*]+))?$/
+      tag =~ /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|[^*]+))?$/ ? true : false
     end
 
     # Calculates the interval for re-querying tags. For every re-query the interval
     # is increased exponentially until the interval reaches the maximum limit of
-    # MAX_SLEEP_INTERVAL.
+    # {#MAX_SLEEP_INTERVAL}.
     #
     # @param delay [Integer] the current sleep interval
     #
     # @return [Integer] the new sleep interval
     #
-    def sleep_interval(delay = 1)
+    def sleep_interval(delay)
       return 2 if delay == 1
       [delay * delay, MAX_SLEEP_INTERVAL].min
     end
+
 
     # Raises an error if the method called is not implemented in the class.
     #

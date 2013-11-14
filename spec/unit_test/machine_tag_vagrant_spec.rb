@@ -29,53 +29,75 @@ describe Chef::MachineTagVagrant do
   end
 
   let(:remote_tags) do
-    '[
-      "database:active=true",
-      "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
-      "rs_login:state=restricted",
-      "rs_monitoring:state=active",
-      "server:private_ip_0=10.100.0.12",
-      "server:public_ip_0=157.56.165.202",
-      "server:uuid=01-83PJQDO8911IT",
-      "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
-    ]'
+    <<-EOF
+[
+  "database:active=true",
+  "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
+  "rs_login:state=restricted",
+  "rs_monitoring:state=active",
+  "server:private_ip_0=10.100.0.12",
+  "server:public_ip_0=157.56.165.202",
+  "server:uuid=01-83PJQDO8911IT",
+  "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
+]
+    EOF
   end
 
   let(:local_tags) do
-   '[
-      "appserver:active=true",
-      "appserver:listen_ip=10.254.84.76",
-      "appserver:listen_port=8000",
-      "rs_login:state=restricted",
-      "rs_monitoring:state=active",
-      "server:private_ip_0=10.254.84.76",
-      "server:public_ip_0=54.214.187.99",
-      "server:uuid=01-6P781RDGU1F13"
-    ]'
+    <<-EOF
+[
+  "appserver:active=true",
+  "appserver:listen_ip=10.254.84.76",
+  "appserver:listen_port=8000",
+  "rs_login:state=restricted",
+  "rs_monitoring:state=active",
+  "server:private_ip_0=10.254.84.76",
+  "server:public_ip_0=54.214.187.99",
+  "server:uuid=01-6P781RDGU1F13"
+]
+    EOF
   end
 
   let(:tag_helper) { Chef::MachineTag.factory(node) }
 
   describe "public methods" do
+    let(:tags_array) { JSON.parse(local_tags) }
+
     before(:each) do
       tag_helper.stub(:make_cache_dir)
-      tag_helper.stub(:read_tag_file).and_return(JSON.parse(local_tags))
-      tag_helper.stub(:write_tag_file)
+      tag_helper.stub(:read_tag_file).and_return(tags_array)
     end
 
     describe "#create" do
-      it "should create a tag" do
-        tag_helper.create('test:tags=foo')
+      context "tag to be created does not already exist" do
+        it "should create a tag" do
+          tag = 'test:tags=foo'
 
-        tag_helper.list['test:tags'].should == 'foo'
+          tag_helper.should_receive(:write_tag_file).with(tags_array.push(tag))
+          tag_helper.create(tag)
+
+          tag_helper.list['test:tags'].should == 'foo'
+        end
+      end
+
+      context "tag to be created already exists" do
+        it "should not create a duplicate tag" do
+          tag_helper.should_receive(:write_tag_file).with(tags_array)
+          tag_helper.create('appserver:active=true')
+        end
       end
     end
 
     describe "#delete" do
-      it "should delete a tag" do
-        tag_helper.delete('appserver:active=true')
+      context "tag to be deleted exists" do
+        it "should delete a tag" do
+          tag = 'appserver:active=true'
+          tags_array.delete(tag)
+          tag_helper.should_receive(:write_tag_file).with(tags_array)
+          tag_helper.delete(tag)
 
-        tag_helper.list['appserver:active'].should be_nil
+          tag_helper.list['appserver:active'].should be_nil
+        end
       end
     end
 
@@ -85,7 +107,7 @@ describe Chef::MachineTagVagrant do
       end
     end
 
-    describe "#query" do
+    describe "#do_query" do
       before(:each) do
         tag_helper.stub(:all_vm_tag_dirs).and_return(["/tmp/master", "/tmp/slave"])
         tag_helper.stub(:read_tag_file).and_return(JSON.parse(remote_tags))
@@ -93,15 +115,18 @@ describe Chef::MachineTagVagrant do
 
       context "query tag exists in the system" do
         it "should return array of tag hashes containing the query tag" do
-          tags = tag_helper.query('server:private_ip_0')
+          tags = tag_helper.send(:do_query, 'server:private_ip_0')
           tags.should be_a(Array)
           tags.first.should be_a(Hash)
+
+          expected_tag_hash = tag_helper.send(:create_tag_hash, JSON.parse(remote_tags))
+          tags.should == Array.new(2) { expected_tag_hash }
         end
       end
 
       context "query tag does not exist in the system" do
         it "should return empty array" do
-          tags = tag_helper.query('server:something=*')
+          tags = tag_helper.send(:do_query, 'server:something=*')
           tags.should be_a(Array)
           tags.should be_empty
         end
@@ -112,11 +137,16 @@ describe Chef::MachineTagVagrant do
   describe "private methods" do
     describe "#update_tag_file" do
       it "should update tag json file" do
-        tag_helper.should_receive(:make_cache_dir)
-        tag_helper.should_receive(:read_tag_file).and_return(JSON.parse(remote_tags))
-        tag_helper.should_receive(:write_tag_file)
+        tags_array = JSON.parse(remote_tags)
+        tag = 'create:some=tag'
 
-        tag_helper.send(:update_tag_file) {}
+        tag_helper.should_receive(:make_cache_dir)
+        tag_helper.should_receive(:read_tag_file).and_return(tags_array)
+        tag_helper.should_receive(:write_tag_file).with(tags_array.push(tag))
+
+        tag_helper.send(:update_tag_file) do |tag_array|
+          tag_array << tag
+        end
       end
     end
 
@@ -124,7 +154,7 @@ describe Chef::MachineTagVagrant do
       context "cache directory does not exist" do
         it "should create tag cache dir" do
           File.should_receive(:directory?).and_return(false)
-          FileUtils.should_receive(:mkdir_p)
+          FileUtils.should_receive(:mkdir_p).with('/vagrant/machine_tag_cache/some_host')
 
           tag_helper.send(:make_cache_dir)
         end

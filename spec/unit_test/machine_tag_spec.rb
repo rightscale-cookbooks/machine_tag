@@ -33,36 +33,38 @@ describe Chef::MachineTag do
     end
 
     it "should raise exception if hostname not found" do
-      expect {
+      expect do
         Chef::MachineTag.vagrant_params_from_node(node)
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
 
     it "should raise exception if machine_tag hash not found in the node" do
-      expect {
+      node.set['hostname'] = 'some_host'
+      expect do
         Chef::MachineTag.vagrant_params_from_node(node)
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
 
     it "should raise exception if vagrant_tag_cache_dir not found in the node" do
+      node.set['hostname'] = 'some_host'
       node.set['machine_tag'] = {}
-      expect {
+      expect do
         Chef::MachineTag.vagrant_params_from_node(node)
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
   end
 
   describe "::factory" do
     context "cloud provider is not found in the node" do
       it "should raise exception if cloud provider not found in the node" do
-        expect {
+        expect do
           Chef::MachineTag.factory(node)
-        }.to raise_error(RuntimeError)
+        end.to raise_error(RuntimeError)
       end
     end
 
     context "cloud provider is vagrant" do
-      it "should return a MachineTagVagrant class" do
+      it "should return an object of MachineTagVagrant class" do
         node.set['cloud']['provider'] = 'vagrant'
         node.set['hostname'] = 'some_host'
         node.set['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/machine_tag_cache/'
@@ -71,7 +73,7 @@ describe Chef::MachineTag do
     end
 
     context "for other cloud providers" do
-      it "should return a MachineTagRightscale class" do
+      it "should return an object of MachineTagRightscale class" do
         node.set['cloud']['provider'] = 'some_cloud'
         Chef::MachineTag.factory(node).should be_an_instance_of(Chef::MachineTagRightscale)
       end

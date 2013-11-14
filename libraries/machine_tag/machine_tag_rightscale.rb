@@ -25,34 +25,37 @@ class Chef
 
     include Chef::Mixin::ShellOut
 
-    # Creates a tag on the server.
+    # Creates a tag on the server. See {#create}.
     #
     def create(tag)
-      run_rs_tag_util("--add #{tag}")
+      run_rs_tag_util("--add", tag)
     end
 
-    # Deletes a tag from the server.
+    # Deletes a tag from the server. See {#delete}.
     #
     def delete(tag)
-      run_rs_tag_util("--remove #{tag}")
+      run_rs_tag_util("--remove", tag)
     end
 
-    # Lists all tags on the server.
+    # Lists all tags on the server. See {#list}.
     #
-    # @return [Hash] the tags on the server
+    # @return [Hash{String => String}] the tags on the server
     #
     def list
-      create_tag_hash(JSON.parse(run_rs_tag_util))
+      create_tag_hash(JSON.parse(run_rs_tag_util("--list")))
     end
+
+
+    protected
 
     # Searches for the given tags on the servers.
     #
     # @param query_string [String] the tags to be queried separated by a blank space
     #
-    # @return [Array<Hash>] the tags on the servers that match the query
+    # @return [Array<Hash{String => String}>] the tags on the servers that match the query
     #
-    def query(query_string)
-      tags_hash = JSON.parse(run_rs_tag_util("--query #{query_string}"))
+    def do_query(query_string)
+      tags_hash = JSON.parse(run_rs_tag_util("--query", query_string))
       tags_hash_array = []
       tags_hash.keys.each do |key|
         tags_hash_array << create_tag_hash(tags_hash[key]['tags']) if tags_hash[key]['tags']
@@ -65,23 +68,19 @@ class Chef
     # Asserts the `rs_tag` utility is in the path.
     #
     def assert_rightscale
-      result = shell_out("which rs_tag")
-      result.error!
+      shell_out!("which rs_tag")
     end
 
     # Runs the `rs_tag` utility.
     #
-    # @param args [String] the arguments for the utility
+    # @param args [Array<String>] the arguments for the utility
     #
     # @return [String] the output from the utility
     #
-    def run_rs_tag_util(args = "--list")
+    def run_rs_tag_util(*args)
       assert_rightscale
-      cmd = "rs_tag #{args}"
-      results = shell_out(cmd)
-      results.error!
-      results.stdout
+      cmd = ['rs_tag'] + args
+      shell_out!(cmd).stdout
     end
-
   end
 end

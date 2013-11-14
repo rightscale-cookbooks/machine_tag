@@ -22,22 +22,22 @@ require File.join(File.dirname(__FILE__), "machine_tag", "machine_tag_rightscale
 require File.join(File.dirname(__FILE__), "machine_tag", "machine_tag_vagrant.rb")
 
 class Chef
-  class MachineTag
+  module MachineTag
 
-    # Factory method for instantiating the correct machine tag class based on `node[:cloud][:provider]`
-    # value. On vagrant environments, the node[:cloud][:provider] will be set to 'vagrant' when the
-    # vagrant-ohai plugin is installed.
+    # Factory method for instantiating the correct machine tag class based on
+    # `node['cloud']['provider']` value. This value will be set to 'vagrant' on
+    # Vagrant environments.
     #
     # @param node [Chef::Node] the chef node
     #
     # @return [Chef::MachineTagVagrant, Chef::MachineTagRightscale] the instance corresponding to
-    # the machine tag environment
+    #   the machine tag environment
     #
     def self.factory(node)
       if node['cloud'].nil? || node['cloud']['provider'].nil?
         raise "ERROR: could not detect a supported machine tag environment."
       elsif node['cloud']['provider'] == 'vagrant'
-        # This is a vagrant environment
+        # This is a Vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
         Chef::MachineTagVagrant.new(hostname, cache_dir)
       else
@@ -48,33 +48,33 @@ class Chef
 
     private
 
-    # Use the factory method to create MachineTag class
-    def initalize; end
-
-    # Harvest vagrant parameters from the chef node.
+    # Harvests Vagrant parameters from the chef node.
+    #
+    # @param node [Chef::Node] the chef node
+    #
+    # @raise [ArgumentError] if Vagrant parameters, namely hostname and machine_tag hash,
+    #   are not found in the node
+    #
     def self.vagrant_params_from_node(node)
-      hostname = node['hostname']
-      err_msg = "ERROR: node['hostname'] not defined. " + readme_info
-      arg_error(err_msg) unless hostname
+      arg_error("node['hostname'] not defined. ") unless node['hostname']
 
       # Verify machine_tag hash
-      err_msg = "ERROR: node['machine_tag'] hash not defined. " + readme_info
-      arg_error(err_msg) unless node.has_key?('machine_tag')
+      arg_error("node['machine_tag'] hash not defined. ") unless node.has_key?('machine_tag')
 
       # Verify cache_dir
-      cache_dir = node['machine_tag']['vagrant_tag_cache_dir']
-      err_msg = "ERROR: node['machine_tag']['vagrant_tag_cache_dir'] not defined. " + readme_info
-      arg_error(err_msg) unless cache_dir
+      unless node['machine_tag']['vagrant_tag_cache_dir']
+        arg_error("node['machine_tag']['vagrant_tag_cache_dir'] not defined. ")
+      end
 
-      return hostname, cache_dir
+      return node['hostname'], node['machine_tag']['vagrant_tag_cache_dir']
     end
 
-    def self.readme_info
-      "Please see the README file in the 'machine_tag' cookbook."
-    end
-
+    # Raises an {#ArgumentError} with a custom error message.
+    #
+    # @param message [String] the error message
+    #
     def self.arg_error(message)
-      raise ArgumentError.new(message)
+      raise ArgumentError, message + "Please see the README file in the 'machine_tag' cookbook."
     end
 
   end
@@ -86,16 +86,17 @@ class Chef
     #
     # @param node [Chef::Node] the chef node
     # @param query [Array] the list of tags to be queried
-    # @param options [Hash] the optional parameters for queries
+    # @param options [Hash{String => String, Integer}] the optional parameters for queries
     #
     # @option options [Array] :required_tags the tags required to available in the query result
-    # @option options [Integer] :query_timeout the timeout value (in minutes) for the query
+    # @option options [Integer] :query_timeout the timeout value (in minutes) for the query.
+    #   By default this is set to 2 minutes.
     #
-    def tag_search(node, query = nil, options = {})
+    def tag_search(node, query, options = {})
       Chef::MachineTag.factory(node).search(query, options)
     end
 
-    # Returns a hash of all tags in the current server.
+    # Returns a hash of all tags on the current server.
     #
     # @param node [Chef::Node] the chef node
     #

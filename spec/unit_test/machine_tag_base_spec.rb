@@ -23,33 +23,78 @@ describe Chef::MachineTagBase do
   MAX_SLEEP_INTERVAL = 60
 
   let(:base) { Chef::MachineTagBase.new }
-  let(:tag_hash_array) do
-    [
-      {
-        'rs_login:state' => 'true',
-        'rs_monitoring:state' => 'active'
-      },
-      {
-        'rs_login:state' => 'restricted'
-      }
-    ]
+  let(:tags) do
+    <<-EOF
+[
+  "database:active=true",
+  "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
+  "rs_login:state=restricted",
+  "rs_monitoring:state=active",
+  "server:private_ip_0=10.100.0.12",
+  "server:public_ip_0=157.56.165.202",
+  "server:uuid=01-83PJQDO8911IT",
+  "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
+]
+    EOF
   end
 
-  let(:tags) do
-    '[
-      "database:active=true",
-      "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
-      "rs_login:state=restricted",
-      "rs_monitoring:state=active",
-      "server:private_ip_0=10.100.0.12",
-      "server:public_ip_0=157.56.165.202",
-      "server:uuid=01-83PJQDO8911IT",
-      "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
-    ]'
+  describe "#search" do
+    let(:tag_hash) { base.send(:create_tag_hash, JSON.parse(tags)) }
+
+    context "when no query options are specified" do
+      it "should do a query and return the tags matching the query" do
+        base.should_receive(:do_query).with('database:active=true').and_return([tag_hash])
+
+        search_output = base.search('database:active=true')
+        search_output.should == [tag_hash]
+      end
+    end
+
+    context "when query options are specified" do
+      context "when 'required_tags' appear in query before query timeout" do
+        it "should re-query until 'required_tags' are found in the query" do
+          query_tag = 'database:active=true'
+
+          # Mimic a scenario where the required_tags are not found in the query
+          # initially, but appears in the query sometime later
+          tag_hash_1 = tag_hash.merge('database:master' => 'true')
+          tag_hash_2 = tag_hash_1.merge('database:repl' => 'active')
+          base.should_receive(:do_query).with(query_tag).at_least(:once).and_return(
+            [tag_hash],
+            [tag_hash_1],
+            [tag_hash_1],
+            [tag_hash_2]
+          )
+
+          query_options = {
+            :required_tags => ['database:master=true', 'database:repl=active']
+          }
+          search_output = base.search(query_tag, query_options)
+          search_output.should == [tag_hash_2]
+        end
+      end
+
+      context "when 'required_tags' do not appear in query before query timeout" do
+        it "should raise a Timeout exception" do
+          query_tag = 'database:active=true'
+
+          base.should_receive(:do_query).with(query_tag).at_least(:once).and_return([tag_hash])
+
+          query_options = {
+            :required_tags => ['database:master=true'],
+            :query_timeout => 1
+          }
+
+          expect do
+            base.search('database:active=true', query_options)
+          end.to raise_error(Timeout::Error)
+        end
+      end
+    end
   end
 
   describe "#sleep_interval" do
-    it "should return interval less than or equal to #{MAX_SLEEP_INTERVAL}" do
+    it "should return interval less than or equal to #{MAX_SLEEP_INTERVAL} seconds" do
       interval = base.send(:sleep_interval, 1)
       interval.should == 2
 
@@ -71,7 +116,7 @@ describe Chef::MachineTagBase do
         'server:something'
       ]
       valid_tags.each do |tag|
-        base.send(:valid_tag_query?, tag).should == 0
+        base.send(:valid_tag_query?, tag).should be_true
       end
 
       invalid_tags = [
@@ -82,13 +127,13 @@ describe Chef::MachineTagBase do
         'n- :blah =!'
       ]
       invalid_tags.each do |tag|
-        base.send(:valid_tag_query?, tag).should be_nil
+        base.send(:valid_tag_query?, tag).should be_false
       end
     end
   end
 
   describe "#split_tag" do
-    it "should split tag into 2 parts - 'namespace:predicate' and 'value'" do
+    it "should split a tag into 2 parts - 'namespace:predicate' and 'value'" do
       value_1, value_2 = base.send(:split_tag, 'some:tag=true')
       value_1.should == 'some:tag'
       value_2.should == 'true'
@@ -100,6 +145,13 @@ describe Chef::MachineTagBase do
   end
 
   describe "#detect_tag" do
+    let(:tag_hash_array) do
+      [
+        {'rs_login:state' => 'true', 'rs_monitoring:state' => 'active'},
+        {'rs_login:state' => 'restricted'}
+      ]
+    end
+
     context "tag is found in the array of tag hashes" do
       it "should return the array of tag hashes containing the tag" do
         output_array = base.send(:detect_tag, tag_hash_array, 'rs_login:state=*')

@@ -21,46 +21,48 @@ require 'json'
 
 class Chef
   class MachineTagVagrant < MachineTagBase
+    # File in the VM where machine tags will be stored
+    #
     TAGS_JSON_FILE = 'tags.json'
 
     # Creates a tag on the VM by adding the tag to its tags cache file
     # if it does not exist.
     #
-    # @return [Boolean] true if the tag is successfully added to the tag cache
+    # @param tag [String] the tag to be created
     #
     def create(tag)
       update_tag_file do |tag_array|
         tag_array << tag unless tag_array.include?(tag)
       end
-      true
     end
 
     # Deletes a tag on the VM by removing the tag from the tags cache file.
     #
-    # @return [Boolean] if the tag is successfully deleted from the tag cache
+    # @param tag [String] the tag to be deleted
     #
     def delete(tag)
       update_tag_file do |tag_array|
         tag_array.delete(tag)
       end
-      true
     end
 
     # Gets the tags on the VM by reading the contents of the tags cache file.
     #
-    # @return [Hash] the tags on the VM
+    # @return [Hash{String => String}] the tags on the VM
     #
     def list
       create_tag_hash(read_tag_file(@tag_file))
     end
 
+    protected
+
     # Searches for the given tags in the tags cache file on all the VMs.
     #
     # @param query_string [String] the tags to be queried separated by a blank space
     #
-    # @return [Array<Hash>] the tags on the VMs that match the query
+    # @return [Array<Hash{String => String}>] the tags on the VMs that match the query
     #
-    def query(query_string)
+    def do_query(query_string)
       query_result = []
       query_tags = query_string.split(' ')
 
@@ -71,8 +73,7 @@ class Chef
       all_vm_tag_dirs.each do |tag_dir|
         tags_array = read_tag_file(::File.join(tag_dir, TAGS_JSON_FILE))
         if tags_array
-          tags_hash_array = []
-          tags_hash_array << create_tag_hash(tags_array)
+          tags_hash_array = [create_tag_hash(tags_array)]
 
           # If at least one of the tags in the query is found in the VM
           # select the VM
@@ -89,6 +90,13 @@ class Chef
 
     private
 
+    # Initializes parameters for machine tags to work in a Vagrant environment.
+    #
+    # @param hostname [String] the host name of the VM
+    # @param cache_dir [String] the directory where the VM tags will be stored
+    #
+    # @return [Chef::MachineTagVagrant] the newly created instance
+    #
     def initialize(hostname, cache_dir)
       @hostname = hostname
       @cache_dir = ::File.join(cache_dir, @hostname)
@@ -101,13 +109,13 @@ class Chef
 
     # Updates the contents of the tag file.
     #
-    # @param [Proc] the block to be executed before updating tag cache directory
+    # @param block [Proc] the block to be executed before updating tag cache directory
     #
-    def update_tag_file
+    def update_tag_file(&block)
       make_cache_dir
       begin
         tag_array = read_tag_file(@tag_file)
-        yield tag_array
+        block.call(tag_array)
         write_tag_file(tag_array)
       end
     end
@@ -120,25 +128,20 @@ class Chef
 
     # Reads the contents of json file into an array.
     #
+    # @param filename [String] the file in VM where the tags are stored
+    #
     # @return [Array] the file contents if file exists, an empty array otherwise
     #
     def read_tag_file(filename)
-      if ::File.exist?(filename)
-        JSON.parse(::File.read(filename))
-      else
-        []
-      end
+      ::File.exist?(filename) ? JSON.parse(::File.read(filename)) : []
     end
 
     # Writes the contents of tag array to a json file.
     #
-    # @return [Boolean] true if file successfully written
+    # @param tag_array [Array<String>] the VM tags to be stored
     #
     def write_tag_file(tag_array)
-      ::File.open(@tag_file, 'w') do |file|
-        file.write(JSON.pretty_generate(tag_array))
-      end
-      true
+      ::File.open(@tag_file, 'w') { |file| file.write(JSON.pretty_generate(tag_array)) }
     end
 
     # Gets all the VM tag cache directories.
@@ -146,8 +149,7 @@ class Chef
     # @return [Array] the VM tag cache directories
     #
     def all_vm_tag_dirs
-      path_for_glob = ::File.expand_path(::File.join(@cache_dir, '..') + '/*')
-      Dir.glob(path_for_glob)
+      Dir.glob(::File.expand_path(::File.join(@cache_dir, '..') + '/*'))
     end
   end
 end
