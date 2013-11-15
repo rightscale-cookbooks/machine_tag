@@ -25,19 +25,23 @@ class Chef
 
     include Chef::Mixin::ShellOut
 
-    # Creates a tag on the server. See {#create}.
+    # Creates a tag on the server.
+    #
+    # @param tag [String] the tag to be created
     #
     def create(tag)
       run_rs_tag_util("--add", tag)
     end
 
-    # Deletes a tag from the server. See {#delete}.
+    # Deletes a tag from the server.
+    #
+    # @param tag [String] the tag to be deleted
     #
     def delete(tag)
       run_rs_tag_util("--remove", tag)
     end
 
-    # Lists all tags on the server. See {#list}.
+    # Lists all tags on the server.
     #
     # @return [Hash{String => String}] the tags on the server
     #

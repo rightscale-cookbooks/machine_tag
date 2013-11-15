@@ -58,8 +58,8 @@ class Chef
     # @param options [Hash{String => String, Integer}] the optional parameters for the query
     #
     # @option options [Array<String>] :required_tags the tags that should be found by the query.
-    # If the tags are not found at the time of the query, re-query until they are found or the timeout is reached
-    # @option options [Integer] :query_timeout the timeout for the query operation
+    #   If the tags are not found at the time of the query, re-query until they are found or the timeout is reached
+    # @option options [Integer] :query_timeout (2) the timeout for the query operation
     #
     # @return [Array<Hash{String => String}>] the array of all tags (in hash format)
     # on the servers that match the query
@@ -148,7 +148,7 @@ class Chef
     # Checks if a tag exists in the array of tag hashes.
     #
     # @param tags_hash_array [Array<Hash{String => String}>] the array of tag hashes
-    # to be looked up
+    #   to be looked up
     # @param tag [String] the tag to search
     #
     # @return [Array] the array of tag hashes that contains the tag, otherwise

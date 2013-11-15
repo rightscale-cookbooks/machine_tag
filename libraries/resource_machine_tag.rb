@@ -31,6 +31,12 @@ class Chef
         @action = :create
       end
 
+      # Name of the machine tag
+      #
+      # @param arg [String] the machine tag name
+      #
+      # @return [String] the machine tag name
+      #
       def name(arg = nil)
         set_or_return(
           :name,

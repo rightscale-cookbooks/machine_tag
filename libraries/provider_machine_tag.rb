@@ -27,19 +27,27 @@ require 'machine_tag_helper.rb'
 class Chef
   class Provider
     class MachineTag < Chef::Provider
-
+      # Finds an existing machine_tag resource on the node based on machine_tag name
+      # and loads the current resource with the attributes on the node.
+      #
+      # @return [Chef::Resource::MachineTag] the resource found in the node
+      #
       def load_current_resource
         @current_resource = Chef::Resource::MachineTag.new(@new_resource.name)
         @tag_helper = get_helper(@run_context.node)
         @current_resource
       end
 
+      # Creates a machine tag on the server.
+      #
       def action_create
         status = @tag_helper.create(new_resource.name)
         Chef::Log.info "Created tag '#{new_resource.name}'"
         new_resource.updated_by_last_action(true)
       end
 
+      # Deletes a machine tag from the server.
+      #
       def action_delete
         status = @tag_helper.delete(new_resource.name)
         Chef::Log.info "Deleted tag '#{new_resource.name}'"
@@ -48,6 +56,12 @@ class Chef
 
       private
 
+      # Gets the machine tag environment based on node values.
+      #
+      # @param node [Chef::Node] the chef node
+      #
+      # @return [Chef::MachineTagVagrant, Chef::MachineTagRightscale] the machine tag environment
+      #
       def get_helper(node)
         Chef::MachineTag.factory(node)
       end

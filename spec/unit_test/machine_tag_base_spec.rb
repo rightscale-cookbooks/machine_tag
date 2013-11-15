@@ -25,16 +25,16 @@ describe Chef::MachineTagBase do
   let(:base) { Chef::MachineTagBase.new }
   let(:tags) do
     <<-EOF
-[
-  "database:active=true",
-  "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
-  "rs_login:state=restricted",
-  "rs_monitoring:state=active",
-  "server:private_ip_0=10.100.0.12",
-  "server:public_ip_0=157.56.165.202",
-  "server:uuid=01-83PJQDO8911IT",
-  "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
-]
+      [
+        "database:active=true",
+        "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
+        "rs_login:state=restricted",
+        "rs_monitoring:state=active",
+        "server:private_ip_0=10.100.0.12",
+        "server:public_ip_0=157.56.165.202",
+        "server:uuid=01-83PJQDO8911IT",
+        "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
+      ]
     EOF
   end
 

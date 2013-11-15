@@ -56,14 +56,14 @@ class Chef
     #   are not found in the node
     #
     def self.vagrant_params_from_node(node)
-      arg_error("node['hostname'] not defined. ") unless node['hostname']
+      arg_error("node['hostname'] not defined.") unless node['hostname']
 
       # Verify machine_tag hash
-      arg_error("node['machine_tag'] hash not defined. ") unless node.has_key?('machine_tag')
+      arg_error("node['machine_tag'] hash not defined.") unless node.has_key?('machine_tag')
 
       # Verify cache_dir
       unless node['machine_tag']['vagrant_tag_cache_dir']
-        arg_error("node['machine_tag']['vagrant_tag_cache_dir'] not defined. ")
+        arg_error("node['machine_tag']['vagrant_tag_cache_dir'] not defined.")
       end
 
       return node['hostname'], node['machine_tag']['vagrant_tag_cache_dir']
@@ -74,7 +74,7 @@ class Chef
     # @param message [String] the error message
     #
     def self.arg_error(message)
-      raise ArgumentError, message + "Please see the README file in the 'machine_tag' cookbook."
+      raise ArgumentError, message + " Please see the README file in the 'machine_tag' cookbook."
     end
 
   end
@@ -89,8 +89,7 @@ class Chef
     # @param options [Hash{String => String, Integer}] the optional parameters for queries
     #
     # @option options [Array] :required_tags the tags required to available in the query result
-    # @option options [Integer] :query_timeout the timeout value (in minutes) for the query.
-    #   By default this is set to 2 minutes.
+    # @option options [Integer] :query_timeout (2) the timeout value (in minutes) for the query.
     #
     def tag_search(node, query, options = {})
       Chef::MachineTag.factory(node).search(query, options)

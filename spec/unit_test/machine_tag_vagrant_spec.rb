@@ -30,31 +30,31 @@ describe Chef::MachineTagVagrant do
 
   let(:remote_tags) do
     <<-EOF
-[
-  "database:active=true",
-  "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
-  "rs_login:state=restricted",
-  "rs_monitoring:state=active",
-  "server:private_ip_0=10.100.0.12",
-  "server:public_ip_0=157.56.165.202",
-  "server:uuid=01-83PJQDO8911IT",
-  "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
-]
+      [
+        "database:active=true",
+        "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
+        "rs_login:state=restricted",
+        "rs_monitoring:state=active",
+        "server:private_ip_0=10.100.0.12",
+        "server:public_ip_0=157.56.165.202",
+        "server:uuid=01-83PJQDO8911IT",
+        "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
+      ]
     EOF
   end
 
   let(:local_tags) do
     <<-EOF
-[
-  "appserver:active=true",
-  "appserver:listen_ip=10.254.84.76",
-  "appserver:listen_port=8000",
-  "rs_login:state=restricted",
-  "rs_monitoring:state=active",
-  "server:private_ip_0=10.254.84.76",
-  "server:public_ip_0=54.214.187.99",
-  "server:uuid=01-6P781RDGU1F13"
-]
+      [
+        "appserver:active=true",
+        "appserver:listen_ip=10.254.84.76",
+        "appserver:listen_port=8000",
+        "rs_login:state=restricted",
+        "rs_monitoring:state=active",
+        "server:private_ip_0=10.254.84.76",
+        "server:public_ip_0=54.214.187.99",
+        "server:uuid=01-6P781RDGU1F13"
+      ]
     EOF
   end
 

@@ -17,6 +17,10 @@ For using this resource in a *Vagrant environment* install the following
  * Bundler
  * Bindler
 
+This resource detects a Vagrant environment when the `node['cloud']['provider']` is set to
+`vagrant`. This value is set automatically when the `vagrant-ohai` plugin is installed.
+For test-kitchen tests, we set this value in the `.kitchen.yml` file.
+
 [Bindler][Bindler] is used to manage Vagrant plugins required by this resource.
 See [Bindler README][Bindler] on how to setup bindler.
 

@@ -23,47 +23,47 @@ describe Chef::MachineTagRightscale do
 
   let(:rs_raw_output) do
     <<-EOF
-{
-  "rs-instance-a3cd8e55f106f8c9edfcb84f7d786b19ee7baa46-7712524001": {
-    "tags": [
-      "database:active=true",
-      "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
-      "rs_login:state=restricted",
-      "rs_monitoring:state=active",
-      "server:private_ip_0=10.100.0.12",
-      "server:public_ip_0=157.56.165.202",
-      "server:uuid=01-83PJQDO8911IT"
-    ]
-  },
-  "rs-instance-29ad5f04e6c298d9b7837b200c80429da8a3f0b5-7712573001": {
-    "tags": [
-      "database:active=true",
-      "rs_dbrepl:master_active=20130604215532-mylineage",
-      "rs_dbrepl:master_instance_uuid=01-25MQ0VQKKDUVQ",
-      "rs_login:state=restricted",
-      "rs_monitoring:state=active",
-      "server:private_ip_0=10.100.0.18",
-      "server:public_ip_0=157.56.165.204",
-      "server:uuid=01-25MQ0VQKKDUVQ",
-      "terminator:discovery_time=Tue Jun 04 22:07:07 +0000 2013"
-    ]
-  }
-}
+      {
+        "rs-instance-a3cd8e55f106f8c9edfcb84f7d786b19ee7baa46-7712524001": {
+          "tags": [
+            "database:active=true",
+            "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
+            "rs_login:state=restricted",
+            "rs_monitoring:state=active",
+            "server:private_ip_0=10.100.0.12",
+            "server:public_ip_0=157.56.165.202",
+            "server:uuid=01-83PJQDO8911IT"
+          ]
+        },
+        "rs-instance-29ad5f04e6c298d9b7837b200c80429da8a3f0b5-7712573001": {
+          "tags": [
+            "database:active=true",
+            "rs_dbrepl:master_active=20130604215532-mylineage",
+            "rs_dbrepl:master_instance_uuid=01-25MQ0VQKKDUVQ",
+            "rs_login:state=restricted",
+            "rs_monitoring:state=active",
+            "server:private_ip_0=10.100.0.18",
+            "server:public_ip_0=157.56.165.204",
+            "server:uuid=01-25MQ0VQKKDUVQ",
+            "terminator:discovery_time=Tue Jun 04 22:07:07 +0000 2013"
+          ]
+        }
+      }
     EOF
   end
 
   let(:rs_list_result) do
     <<-EOF
-[
-  "appserver:active=true",
-  "appserver:listen_ip=10.254.84.76",
-  "appserver:listen_port=8000",
-  "rs_login:state=restricted",
-  "rs_monitoring:state=active",
-  "server:private_ip_0=10.254.84.76",
-  "server:public_ip_0=54.214.187.99",
-  "server:uuid=01-6P781RDGU1F13"
-]
+      [
+        "appserver:active=true",
+        "appserver:listen_ip=10.254.84.76",
+        "appserver:listen_port=8000",
+        "rs_login:state=restricted",
+        "rs_monitoring:state=active",
+        "server:private_ip_0=10.254.84.76",
+        "server:public_ip_0=54.214.187.99",
+        "server:uuid=01-6P781RDGU1F13"
+      ]
     EOF
   end
 
