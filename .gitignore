@@ -17,3 +17,5 @@ VERSION
 .kitchen/
 .kitchen.local.yml
 cache_dir/machine_tag_cache
+.yardoc/
+doc/

@@ -31,11 +31,18 @@ class Chef
         @action = :create
       end
 
+      # Name of the machine tag
+      #
+      # @param arg [String] the machine tag name
+      #
+      # @return [String] the machine tag name
+      #
       def name(arg = nil)
         set_or_return(
           :name,
           arg,
-          :kind_of => String  #TODO: add regex validation
+          :kind_of => String,
+          :regex => /^[a-zA-Z]\w*:[a-zA-Z]\w*=(\*|[^*]+)$/
         )
       end
 

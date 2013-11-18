@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: machine_tag
-# Spec:: spec_helper
+# Cookbook Name:: fake
+# Recipe:: list_tags
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,10 +17,13 @@
 # limitations under the License.
 #
 
-lib = File.expand_path('../../libraries', __FILE__)
-$:.unshift(lib) unless $:.include?(lib)
+class Chef::Resource::RubyBlock
+  include Chef::MachineTagHelper
+end
 
-require 'chefspec'
-require 'machine_tag_helper'
-require 'provider_machine_tag'
-require 'resource_machine_tag'
+ruby_block "listing master tags" do
+  block do
+    tags_list = tag_list(node)
+    Chef::Log.info tags_list.inspect
+  end
+end

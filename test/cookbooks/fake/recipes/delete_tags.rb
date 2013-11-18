@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: machine_tag
-# Recipe:: test_producer
+# Cookbook Name:: fake
+# Recipe:: delete_tags
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,9 +17,6 @@
 # limitations under the License.
 #
 
-ip_addr = node['cloud']['public_ips'][0] if node['cloud']
-ip_addr ||= node['ipaddress']
-
-machine_tag "test:master=true"
-machine_tag "test:master_ip=#{ip_addr}"
-machine_tag "test:master_hostname=#{node['hostname']}"
+machine_tag "master:login=restricted" do
+  action :delete
+end

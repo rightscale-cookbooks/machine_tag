@@ -25,51 +25,66 @@ class Chef
 
     include Chef::Mixin::ShellOut
 
+    # Creates a tag on the server.
+    #
+    # @param tag [String] the tag to be created
+    #
     def create(tag)
-      run_rs_tag_util("--add #{tag}")
+      run_rs_tag_util("--add", tag)
     end
 
-    def search(query = nil, args = {})
-      stdout = run_rs_tag_util("--query #{query}")
-      t_hash = JSON.parse(stdout)
-      t_array = []
-      t_hash.keys.each do |key|
-        t_array << create_tag_hash(t_hash[key]["tags"]) if t_hash[key]["tags"]
-      end
-      t_array
+    # Deletes a tag from the server.
+    #
+    # @param tag [String] the tag to be deleted
+    #
+    def delete(tag)
+      run_rs_tag_util("--remove", tag)
     end
 
+    # Lists all tags on the server.
+    #
+    # @return [Hash{String => String}] the tags on the server
+    #
     def list
-      run_rs_tag_util
+      create_tag_hash(JSON.parse(run_rs_tag_util("--list")))
+    end
+
+
+    protected
+
+    # Searches for the given tags on the servers.
+    #
+    # @param query_string [String] the tags to be queried separated by a blank space
+    #
+    # @return [Array<Hash{String => String}>] the tags on the servers that match the query
+    #
+    def do_query(query_string)
+      tags_hash = JSON.parse(run_rs_tag_util("--query", query_string))
+      tags_hash_array = []
+      tags_hash.keys.each do |key|
+        tags_hash_array << create_tag_hash(tags_hash[key]['tags']) if tags_hash[key]['tags']
+      end
+      tags_hash_array
     end
 
     private
 
-    # Break up tags into key, value pairs
-    # where the key contains "namespace:predicate"
-    def create_tag_hash(tags_array)
-      t_hash = {}
-      tags_array.each do |tag|
-        namespace_predicate, value = tag.split('=')
-        t_hash[namespace_predicate] = value
-      end
-      t_hash
-    end
-
-    # make sure the `rs_tag` utility is in our path
+    # Asserts the `rs_tag` utility is in the path.
+    #
     def assert_rightscale
-      result = shell_out("which rs_tag")
-      result.error!
+      shell_out!("which rs_tag")
     end
 
-    # run the `rs_tag` utility
-    def run_rs_tag_util(args = "--list")
+    # Runs the `rs_tag` utility.
+    #
+    # @param args [Array<String>] the arguments for the utility
+    #
+    # @return [String] the output from the utility
+    #
+    def run_rs_tag_util(*args)
       assert_rightscale
-      cmd = "rs_tag #{args}"
-      results = shell_out(cmd)
-      results.error!
-      results.stdout
+      cmd = ['rs_tag'] + args
+      shell_out!(cmd).stdout
     end
-
   end
 end

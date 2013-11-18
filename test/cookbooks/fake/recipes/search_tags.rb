@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: machine_tag
-# Recipe:: test_tags
+# Cookbook Name:: fake
+# Recipe:: search_tags
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,19 +17,15 @@
 # limitations under the License.
 #
 
-# see libaries/machine_tag_helper.rb
-class Chef::Resource
+class Chef::Resource::RubyBlock
   include Chef::MachineTagHelper
 end
 
-# add a tag to myself
-machine_tag "test:slave=true"
-
-# now see if I can list my tags
-ruby_block "look for my tags" do
+ruby_block "searching master tags" do
   block do
-    my_tags = tag_list(node)
-    Chef::Log.info "My Tags: #{my_tags.inspect}"
-    raise "Did not find the my tag!" unless my_tags.has_key?("test:slave")
+    master_tags = tag_search(node, "master:ip").first
+    Chef::Log.info "Master IP: " + master_tags["master:ip"]
+    Chef::Log.info "Master Hostname: " + master_tags["master:hostname"]
+    Chef::Log.info "Master Login State: " + master_tags["master:login"]
   end
 end

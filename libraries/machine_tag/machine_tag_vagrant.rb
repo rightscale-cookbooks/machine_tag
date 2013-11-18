@@ -21,102 +21,135 @@ require 'json'
 
 class Chef
   class MachineTagVagrant < MachineTagBase
+    # File in the VM where machine tags will be stored
+    #
+    TAGS_JSON_FILE = 'tags.json'
 
+    # Creates a tag on the VM by adding the tag to its tags cache file
+    # if it does not exist.
+    #
+    # @param tag [String] the tag to be created
+    #
     def create(tag)
-      read_write_my_persist_file do |tag_array|
-        tag_array << tag unless tag_array.include? tag
+      update_tag_file do |tag_array|
+        tag_array << tag unless tag_array.include?(tag)
       end
-      true
     end
 
+    # Deletes a tag on the VM by removing the tag from the tags cache file.
+    #
+    # @param tag [String] the tag to be deleted
+    #
     def delete(tag)
-      read_write_my_persist_file do |tag_array|
+      update_tag_file do |tag_array|
         tag_array.delete(tag)
       end
-      true
     end
 
+    # Gets the tags on the VM by reading the contents of the tags cache file.
+    #
+    # @return [Hash{String => String}] the tags on the VM
+    #
     def list
-      list = nil
-      read_write_my_persist_file do |tag_array|
-        list = tag_array
-      end
-      create_tag_hash(list)
+      create_tag_hash(read_tag_file(@tag_file))
     end
 
-    def search(query = nil, args = {})
-      t_array = []
+    protected
+
+    # Searches for the given tags in the tags cache file on all the VMs.
+    #
+    # @param query_string [String] the tags to be queried separated by a blank space
+    #
+    # @return [Array<Hash{String => String}>] the tags on the VMs that match the query
+    #
+    def do_query(query_string)
+      query_result = []
+      query_tags = query_string.split(' ')
+
+      # Return empty array if no tags are found in the query string
+      return query_result if query_tags.empty?
+
+      # Query all VMs for the tags
       all_vm_tag_dirs.each do |tag_dir|
-        tag_file = ::File.join(tag_dir, "tags.json")
-        tag_array = read_tag_file(tag_file)
-        # TODO: right now returns all tags for all VMs.  Need to filter based on query
-        t_array << create_tag_hash(tag_array) if tag_array
+        tags_array = read_tag_file(::File.join(tag_dir, TAGS_JSON_FILE))
+        if tags_array
+          tags_hash_array = [create_tag_hash(tags_array)]
+
+          # If at least one of the tags in the query is found in the VM
+          # select the VM
+          query_tags.each do |tag|
+            unless detect_tag(tags_hash_array, tag).empty?
+              query_result += tags_hash_array
+              break
+            end
+          end
+        end
       end
-      t_array
+      query_result
     end
 
     private
 
-    def initialize(box_name, cache_dir)
-      @box_name = box_name
-      @cache_dir = ::File.join(cache_dir, "#{@box_name}")
-      @tag_file = ::File.join(@cache_dir, "tags.json")
+    # Initializes parameters for machine tags to work in a Vagrant environment.
+    #
+    # @param hostname [String] the host name of the VM
+    # @param cache_dir [String] the directory where the VM tags will be stored
+    #
+    # @return [Chef::MachineTagVagrant] the newly created instance
+    #
+    def initialize(hostname, cache_dir)
+      @hostname = hostname
+      @cache_dir = ::File.join(cache_dir, @hostname)
+      @tag_file = ::File.join(@cache_dir, TAGS_JSON_FILE)
     end
 
     # These private methods are thanks to Ryan Geyer's work in his
     # rs_vagrant_shim project:
     #  https://github.com/rgeyer-rs-cookbooks/rs_vagrant_shim
 
-    # Accesses the persist.json file in the shim directory of "this" VM.
+    # Updates the contents of the tag file.
     #
-    # Expects to be passed a block which will have a hash yielded to it.  That hash
-    # will represent the current contents of the persist.json file.  When the block
-    # returns, any changes to the hash will be written back to the persist.json file
-    def read_write_my_persist_file
+    # @param block [Proc] the block to be executed before updating tag cache directory
+    #
+    def update_tag_file(&block)
       make_cache_dir
       begin
-        tag_hash = read_tag_file(@tag_file)
-        yield tag_hash
-        write_tag_file(tag_hash)
+        tag_array = read_tag_file(@tag_file)
+        block.call(tag_array)
+        write_tag_file(tag_array)
       end
     end
 
+    # Creates tag cache directory in the VM.
+    #
     def make_cache_dir
-      ::FileUtils.mkdir_p @cache_dir unless ::File.directory? @cache_dir
+      ::FileUtils.mkdir_p(@cache_dir) unless ::File.directory?(@cache_dir)
     end
 
-    # Reads the contents of json file into an array
+    # Reads the contents of json file into an array.
     #
-    # @return An array representing the contents of the file, or an empty Array if the file does not exist
+    # @param filename [String] the file in VM where the tags are stored
+    #
+    # @return [Array] the file contents if file exists, an empty array otherwise
+    #
     def read_tag_file(filename)
-      if ::File.exist? filename
-        JSON.parse(::File.read(filename))
-      else
-        []
-      end
+      ::File.exist?(filename) ? JSON.parse(::File.read(filename)) : []
     end
 
-    # Writes the contents of tag array to a json file
+    # Writes the contents of tag array to a json file.
     #
-    # @return true
-    def write_tag_file(tag_hash)
-      ::File.open(@tag_file, 'w') do |file|
-        file.write(JSON.pretty_generate(tag_hash))
-      end
-      true
-    end
-
-    # Lists all directories that are in the same directory as the shim directory
-    # for "this" VM.  Excludes "this" VM
+    # @param tag_array [Array<String>] the VM tags to be stored
     #
-    def other_vm_tag_dirs
-      all_vm_tag_dirs.select{|dir| dir != @cache_dir}
+    def write_tag_file(tag_array)
+      ::File.open(@tag_file, 'w') { |file| file.write(JSON.pretty_generate(tag_array)) }
     end
 
+    # Gets all the VM tag cache directories.
+    #
+    # @return [Array] the VM tag cache directories
+    #
     def all_vm_tag_dirs
-      path_for_glob = ::File.expand_path(::File.join(@cache_dir, '..') + '/*')
-      Dir.glob(path_for_glob)
+      Dir.glob(::File.expand_path(::File.join(@cache_dir, '..') + '/*'))
     end
-
   end
 end

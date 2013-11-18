@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: machine_tag
-# Recipe:: test_consumer
+# Cookbook Name:: fake
+# Recipe:: create_tags
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,18 +17,15 @@
 # limitations under the License.
 #
 
-# see libraries/machine_tag_helper.rb
-class Chef::Recipe
-  include Chef::MachineTagHelper
+ip_addr = node['cloud']['public_ips'][0] if (node['cloud'] && node['cloud']['public_ips'])
+ip_addr ||= node['ipaddress']
+
+machine_tag "master:ip=#{ip_addr}" do
+  action :create
 end
 
-# search for tags previouly produced on another VM
-# see ../Vagrantfile for VM setup and runlist
-all_tags = tag_search(node)
-Chef::Log.info "All Tags: #{all_tags.inspect}"
+machine_tag "master:hostname=#{node['hostname']}" do
+  action :create
+end
 
-# can we extract the IP address of the master?
-master_tags = all_tags.select { |tags| tags["test:master"] == "true" }.first
-Chef::Log.info master_tags.inspect
-raise "Did not find the master tag!" unless master_tags
-Chef::Log.info "Master IP is #{master_tags['test:master_ip']}"
+machine_tag "master:login=restricted"

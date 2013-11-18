@@ -1,38 +1,104 @@
 # machine_tag cookbook
 
-Add support for [machine tags](http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging).
+[![Build Status](https://travis-ci.org/rightscale-cookbooks/machine_tag.png?branch=master)](https://travis-ci.org/rightscale-cookbooks/machine_tag)
 
-This cookbook adds support for machine tags in the Vagrant and RightScale environments. We hope to add support for Chef
-Server also.
+This cookbook provides a `machine_tag` resource that can create, delete, list, and
+search [machine tags][Tagging] in the Vagrant and RightScale environments. 
+
+[Tagging]: http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging
 
 # Requirements
 
-For Vagrant environments you will need the following installed:
+## Vagrant Environment
 
- * Vagrant 1.1+
+For using this resource in a *Vagrant environment* install the following
+
+ * Vagrant 1.2+
  * Bundler
+ * Bindler
 
-You must also set a unique hostname for each VM in your Vagrantfile. To set this use the `config.vm.host_name`
-configuration key:
+This resource detects a Vagrant environment when the `node['cloud']['provider']` is set to
+`vagrant`. This value is set automatically when the `vagrant-ohai` plugin is installed.
+For test-kitchen tests, we set this value in the `.kitchen.yml` file.
+
+[Bindler][Bindler] is used to manage Vagrant plugins required by this resource.
+See [Bindler README][Bindler] on how to setup bindler.
+
+[Bindler]: https://github.com/fgrehm/bindler
+
+The Vagrant plugins required by this resource to work on a Vagrant environment
+is put inside `plugins.json` file in the root of the repository. Once Bindler is set
+up, install these plugins by running
+
+```
+vagrant plugin bundle
+```
+
+Set a unique hostname for each VM in your Vagrantfile. To set this use the
+`config.vm.host_name` configuration key:
 
 ```ruby
 master.vm.host_name = "master"
 ```
-
 See `Vagrantfile` for an example.
 
-# Usage
+## RightScale Environment
 
-To test out this cookbooks download to your Berkshelf development environment and run the following commands:
+For using this resource in a *RightScale Environment*, the system must be a
+RightScale managed VM to have the required access to the [rs_tag utility][rs_tag].
 
- * bundle install
- * bundle exec thor spec
- * bundle exec vagrant up
+[rs_tag]: http://support.rightscale.com/12-Guides/RightLink/01-RightLink_Overview/RightLink_Command_Line_Utilities#rs_tag
 
-# Functions
 
-Just include the `Chef::MachineTagHelper` into your recipe to use the `tag_search` and `tag_list` functions. For
-example:
+# Resource/Provider
+
+## machine_tag
+
+A resource to create and delete machine_tags on a VM.
+
+### Action: create
+
+Creates a new machine_tag on the VM.
+
+#### Parameters
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td>name</td>
+    <td>Name of the tag to be created</td>
+    <td></td>
+  </tr>
+</table>
+
+### Action: delete
+
+Deletes a machine_tag from the VM.
+
+#### Parameters
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td>name</td>
+    <td>Name of the tag to be deleted</td>
+    <td></td>
+  </tr>
+</table>
+
+
+# Helpers
+
+This resource also provides two helper methods for listing and searching tags on a VM.
+To use them in a recipe have the following code block in the recipe
 
 ```ruby
 class Chef::Recipe
@@ -42,40 +108,93 @@ end
 
 ## tag_search(node, query, args)
 
-Returns and array of tag hashes for all servers in your environment. Currently the `query` and `args` parameters are not
-used. See `recipes/test_producer.rb` and `recipes/test_consumer.rb` for an example.
+Returns an array of tag hashes for all servers in your environment that matches the query.
+
+### Parameters
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Type</th>
+  </tr>
+  <tr>
+    <td>node</td>
+    <td>the environment (Vagrant or RightScale)</td>
+    <td>`Chef::Node`</td>
+  </tr>
+  <tr>
+    <td>query</td>
+    <td>the tags to be queried (multiple tags are space delimited)</td>
+    <td>String</td>
+  </tr>
+  <tr>
+    <td>options</td>
+    <td>optional parameters to the query</td>
+    <td>Hash</td>
+  </tr>
+</table>
 
 ## tag_list(node)
 
-Returns a tag hash for the current server.  See `recipes/test_tags.rb` for an example.
+Returns a tag hash for the current server.
 
-# Resources
+<table>
+  <tr> 
+    <th>Name</th>
+    <th>Description</th>
+    <th>Type</th>
+  </tr>
+  <tr>
+    <td>node</td>
+    <td>the environment (Vagrant or RightScale)</td>
+    <td>`Chef::Node`</td>
+  </tr>
+</table>
 
-## machine_tag
 
-The machine_tag resource allows your recipes to `:create` or `:delete` machine tags on your servers.
+# Usage
+
+To create a machine_tag
 
 ```ruby
-machine_tag "test:master=true"
+machine_tag "namespace:predicate=value" do
+  action :create
+end
 ```
 
-Creates a tag
+To delete a machine_tag
 
 ```ruby
-machine_tag "test:master=true" do
+machine_tag "namespace:predicate=value" do
   action :delete
 end
 ```
 
-Removes the tag
+To list tags in the VM
+
+```ruby
+class Chef::Recipe
+  include Chef::MachineTagHelper
+end
+
+tags = tag_list(node)
+```
+
+To search tags in the VM
+
+```ruby
+class Chef::Recipe
+  include Chef::MachineTagHelper
+end
+
+tags = tag_list(node, 'test:tag=foo foo:bar=* some:tag')
+```
 
 # Attributes
 
 `node['machine_tag']['vagrant_tag_cache_dir']` : where to store the tag data for each server. 
   Only used in Vagrant environments. This should match a `config.vm.synced_folder` entry in your Vagrantfile for
   `tag_search()` to work across VMs. See the `Vagrantfile` for an example.
-
-# Recipes
 
 # Author
 
