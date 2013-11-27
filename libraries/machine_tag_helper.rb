@@ -30,7 +30,7 @@ class Chef
     #
     # @param node [Chef::Node] the chef node
     #
-    # @return [Chef::MachineTagVagrant, Chef::MachineTagRightscale] the instance corresponding to
+    # @return [Chef::MachineTagBase] the instance corresponding to
     #   the machine tag environment
     #
     def self.factory(node)
@@ -92,19 +92,23 @@ class Chef
     # for the tags until they become available in one of the servers.
     #
     # @param node [Chef::Node] the chef node
-    # @param query [Array<String>] the list of tags to be queried
+    # @param query_tags [Array<String>] the list of tags to be queried
     # @param options [Hash{String => String, Integer}] the optional parameters for queries
     #
     # @option options [Array] :required_tags the tags required to available in the query result
     # @option options [Integer] :query_timeout (2) the timeout value (in minutes) for the query.
     #
-    def tag_search(node, query, options = {})
-      Chef::MachineTag.factory(node).search(query, options)
+    # @return [Array<MachineTag::Set>] the array of all tags on the servers that matched the query tags
+    #
+    def tag_search(node, query_tags, options = {})
+      Chef::MachineTag.factory(node).search(query_tags, options)
     end
 
-    # Returns a hash of all tags on the current server.
+    # Returns a set of all tags on the current server.
     #
     # @param node [Chef::Node] the chef node
+    #
+    # @return [MachineTag::Set] the set of all tags on the server
     #
     def tag_list(node)
       Chef::MachineTag.factory(node).list

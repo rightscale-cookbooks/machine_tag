@@ -58,13 +58,12 @@ class Chef
 
     # Searches for the given tags in the tags cache file on all the VMs.
     #
-    # @param query_string [String] the tags to be queried separated by a blank space
+    # @param query_tags [Array<String>] the tags to be queried
     #
     # @return [Array<MachineTag::Set>] the tags on the VMs that match the query
     #
-    def do_query(query_string)
+    def do_query(*query_tags)
       query_result = []
-      query_tags = query_string.split(' ')
 
       # Return empty array if no tags are found in the query string
       return query_result if query_tags.empty?

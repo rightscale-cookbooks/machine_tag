@@ -54,7 +54,7 @@ class Chef
 
     # Returns the list of tags for all server that match the query.
     #
-    # @param query_string [String] the tags separated by space that should be queried
+    # @param query_tags [Array<String>] the tags to be queried
     # @param options [Hash{String => String, Integer}] the optional parameters for the query
     #
     # @option options [Array<String>] :required_tags the tags that should be found by the query.
@@ -66,8 +66,8 @@ class Chef
     #
     # @raise [Timeout::Error] if the required tags could not be found within the time
     #
-    def search(query_string, options = {})
-      tags_set_array = do_query(query_string)
+    def search(query_tags, options = {})
+      tags_set_array = do_query(query_tags)
 
       unless options[:required_tags].nil? || options[:required_tags].empty?
         # Set timeout for querying for required_tags. By default, the timeout is set
@@ -86,7 +86,7 @@ class Chef
                 sleep sleep_sec
 
                 Chef::Log.info "Re-querying for '#{tag}'..."
-                tags_set_array = do_query(query_string)
+                tags_set_array = do_query(query_tags)
               end
             end
           end
@@ -103,11 +103,11 @@ class Chef
     # Queries for a specific tag on all servers and returns all the tags on the servers
     # that match the query.
     #
-    # @param query_string [String] the tags to be queried separated by blank space
+    # @param query_tags [Array<String>] the tags to be queried
     #
-    # @return [Array<Hash{String => String}>] the list of all tags on the servers that match the query
+    # @return [Array<MachineTag::Set>] the list of all tags on the servers that match the query
     #
-    def do_query(query_string = '')
+    def do_query(*query_tags)
       not_implemented
     end
 
