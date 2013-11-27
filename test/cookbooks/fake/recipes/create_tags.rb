@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+include_recipe 'machine_tag::default'
+
 ip_addr = node['cloud']['public_ips'][0] if (node['cloud'] && node['cloud']['public_ips'])
 ip_addr ||= node['ipaddress']
 

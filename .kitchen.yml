@@ -23,6 +23,9 @@ platforms:
     box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_centos-5.9_provisionerless.box
 
 suites:
+- name: default
+  run_list: ["recipe[machine_tag::default]"]
+
 - name: create
   run_list: ["recipe[fake::create_tags]"]
   attributes:

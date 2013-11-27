@@ -34,6 +34,13 @@ class Chef
     #   the machine tag environment
     #
     def self.factory(node)
+      begin
+        require 'machine_tag'
+      rescue LoadError => e
+        raise e, "'machine_tag' gem is not installed!" +
+          " Run the 'machine_tag::default' recipe first to install this gem."
+      end
+
       if node['cloud'].nil? || node['cloud']['provider'].nil?
         raise "ERROR: could not detect a supported machine tag environment."
       elsif node['cloud']['provider'] == 'vagrant'
@@ -85,7 +92,7 @@ class Chef
     # for the tags until they become available in one of the servers.
     #
     # @param node [Chef::Node] the chef node
-    # @param query [Array] the list of tags to be queried
+    # @param query [Array<String>] the list of tags to be queried
     # @param options [Hash{String => String, Integer}] the optional parameters for queries
     #
     # @option options [Array] :required_tags the tags required to available in the query result

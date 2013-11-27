@@ -97,34 +97,34 @@ describe Chef::MachineTagRightscale do
   end
 
   describe "#do_query" do
-    it "should return an array of tag hashes containing the query tag" do
+    it "should return an array of tag sets containing the query tag" do
       tag_helper.should_receive(:run_rs_tag_util).with('--query', 'database:active=true').and_return(rs_raw_output)
 
       tags = tag_helper.send(:do_query, 'database:active=true')
       tags.should be_a(Array)
-      tags.first.should be_a(Hash)
+      tags.first.should be_a(MachineTag::Set)
 
       expected_output = [
-        {
-          "database:active" => "true",
-          "rs_dbrepl:slave_instance_uuid" => "01-83PJQDO8911IT",
-          "rs_login:state" => "restricted",
-          "rs_monitoring:state" => "active",
-          "server:private_ip_0" => "10.100.0.12",
-          "server:public_ip_0" => "157.56.165.202",
-          "server:uuid" => "01-83PJQDO8911IT"
-        },
-        {
-          "database:active" => "true",
-          "rs_dbrepl:master_active" => "20130604215532-mylineage",
-          "rs_dbrepl:master_instance_uuid" => "01-25MQ0VQKKDUVQ",
-          "rs_login:state" => "restricted",
-          "rs_monitoring:state" => "active",
-          "server:private_ip_0" => "10.100.0.18",
-          "server:public_ip_0" => "157.56.165.204",
-          "server:uuid" => "01-25MQ0VQKKDUVQ",
-          "terminator:discovery_time" => "Tue Jun 04 22:07:07 +0000 2013"
-        }
+        MachineTag::Set[
+          "database:active=true",
+          "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
+          "rs_login:state=restricted",
+          "rs_monitoring:state=active",
+          "server:private_ip_0=10.100.0.12",
+          "server:public_ip_0=157.56.165.202",
+          "server:uuid=01-83PJQDO8911IT"
+        ],
+        MachineTag::Set[
+          "database:active=true",
+          "rs_dbrepl:master_active=20130604215532-mylineage",
+          "rs_dbrepl:master_instance_uuid=01-25MQ0VQKKDUVQ",
+          "rs_login:state=restricted",
+          "rs_monitoring:state=active",
+          "server:private_ip_0=10.100.0.18",
+          "server:public_ip_0=157.56.165.204",
+          "server:uuid=01-25MQ0VQKKDUVQ",
+          "terminator:discovery_time=Tue Jun 04 22:07:07 +0000 2013"
+        ]
       ]
 
       tags.should == expected_output

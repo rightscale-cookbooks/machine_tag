@@ -18,6 +18,7 @@
 #
 
 require 'spec_helper'
+require 'machine_tag'
 
 describe Chef::MachineTagBase do
   MAX_SLEEP_INTERVAL = 60
@@ -39,38 +40,36 @@ describe Chef::MachineTagBase do
   end
 
   describe "#search" do
-    let(:tag_hash) { base.send(:create_tag_hash, JSON.parse(tags)) }
+    let(:tag_set) { base.send(:create_tag_set, JSON.parse(tags)) }
 
     context "when no query options are specified" do
       it "should do a query and return the tags matching the query" do
-        base.should_receive(:do_query).with('database:active=true').and_return([tag_hash])
+        base.should_receive(:do_query).with('database:active=true').and_return([tag_set])
 
         search_output = base.search('database:active=true')
-        search_output.should == [tag_hash]
+        search_output.should == [tag_set]
       end
     end
 
     context "when query options are specified" do
       context "when 'required_tags' appear in query before query timeout" do
         it "should re-query until 'required_tags' are found in the query" do
-          query_tag = 'database:active=true'
-
+          tag_set_1 = tag_set.union(['database:master=true'])
+          tag_set_2 = tag_set_1.union(['database:repl=active'])
           # Mimic a scenario where the required_tags are not found in the query
           # initially, but appears in the query sometime later
-          tag_hash_1 = tag_hash.merge('database:master' => 'true')
-          tag_hash_2 = tag_hash_1.merge('database:repl' => 'active')
-          base.should_receive(:do_query).with(query_tag).at_least(:once).and_return(
-            [tag_hash],
-            [tag_hash_1],
-            [tag_hash_1],
-            [tag_hash_2]
+          base.should_receive(:do_query).with('database:active=true').at_least(:once).and_return(
+            [tag_set],
+            [tag_set_1],
+            [tag_set_1],
+            [tag_set_2]
           )
 
           query_options = {
             :required_tags => ['database:master=true', 'database:repl=active']
           }
-          search_output = base.search(query_tag, query_options)
-          search_output.should == [tag_hash_2]
+          search_output = base.search('database:active=true', query_options)
+          search_output.should == [tag_set_2]
         end
       end
 
@@ -78,7 +77,7 @@ describe Chef::MachineTagBase do
         it "should raise a Timeout exception" do
           query_tag = 'database:active=true'
 
-          base.should_receive(:do_query).with(query_tag).at_least(:once).and_return([tag_hash])
+          base.should_receive(:do_query).with(query_tag).at_least(:once).and_return([tag_set])
 
           query_options = {
             :required_tags => ['database:master=true'],
@@ -106,7 +105,7 @@ describe Chef::MachineTagBase do
     end
   end
 
-  describe "#valid_tag_query" do
+  describe "#valid_tag_query?" do
     it "should validate the tag passed in the query" do
       valid_tags = [
         'namespace:predicate=value',
@@ -116,7 +115,7 @@ describe Chef::MachineTagBase do
         'server:something'
       ]
       valid_tags.each do |tag|
-        base.send(:valid_tag_query?, tag).should be_true
+        base.send(:valid_tag_query?, MachineTag::Tag.new(tag)).should be_true
       end
 
       invalid_tags = [
@@ -127,58 +126,46 @@ describe Chef::MachineTagBase do
         'n- :blah =!'
       ]
       invalid_tags.each do |tag|
-        base.send(:valid_tag_query?, tag).should be_false
+        base.send(:valid_tag_query?, MachineTag::Tag.new(tag)).should be_false
       end
-    end
-  end
-
-  describe "#split_tag" do
-    it "should split a tag into 2 parts - 'namespace:predicate' and 'value'" do
-      value_1, value_2 = base.send(:split_tag, 'some:tag=true')
-      value_1.should == 'some:tag'
-      value_2.should == 'true'
-
-      value_1, value_2 = base.send(:split_tag, 'some:tag=true=true')
-      value_1.should == 'some:tag'
-      value_2.should == 'true=true'
     end
   end
 
   describe "#detect_tag" do
-    let(:tag_hash_array) do
+    let(:tag_set_array) do
       [
-        {'rs_login:state' => 'true', 'rs_monitoring:state' => 'active'},
-        {'rs_login:state' => 'restricted'}
+        MachineTag::Set.new(['rs_login:state=true', 'rs_monitoring:state=active']),
+        MachineTag::Set.new(['rs_login:state=restricted'])
       ]
     end
 
-    context "tag is found in the array of tag hashes" do
-      it "should return the array of tag hashes containing the tag" do
-        output_array = base.send(:detect_tag, tag_hash_array, 'rs_login:state=*')
+    context "tag is found in the array of tag sets" do
+      it "should return the array of tag sets containing the tag" do
+        output_array = base.send(:detect_tag, tag_set_array, 'rs_login:state=*')
         output_array.should have(2).items
 
-        output_array = base.send(:detect_tag, tag_hash_array, 'rs_monitoring:state=active')
+        output_array = base.send(:detect_tag, tag_set_array, 'rs_monitoring:state=active')
         output_array.should have(1).items
 
-        output_array = base.send(:detect_tag, tag_hash_array, 'rs_monitoring:state')
+        output_array = base.send(:detect_tag, tag_set_array, 'rs_monitoring:state')
         output_array.should have(1).items
       end
     end
 
-    context "tag is not found in the array of tag hashes" do
+    context "tag is not found in the array of tag sets" do
       it "should return an empty array" do
-        output_array = base.send(:detect_tag, tag_hash_array, 'some:state=*')
+        output_array = base.send(:detect_tag, tag_set_array, 'some:state=*')
         output_array.should be_empty
       end
     end
   end
 
-  describe "#create_tag_hash" do
-    it "should create a tag hash with 'namespace:predicate' as key and 'value' as value" do
-      output_hash = base.send(:create_tag_hash, ['some:tag=1', 'foo:bar=2+5 = 7'])
+  describe "#create_tag_set" do
+    it "should create a tag set" do
+      output_set = base.send(:create_tag_set, ['some:tag=1', 'foo:bar=2+5 = 7'])
 
-      output_hash.keys.should == ['some:tag', 'foo:bar']
-      output_hash.values.should == ['1', '2+5 = 7']
+      output_set.should include('some:tag=1')
+      output_set.should include('foo:bar=2+5 = 7')
     end
   end
 end

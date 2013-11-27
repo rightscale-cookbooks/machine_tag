@@ -76,7 +76,7 @@ describe Chef::MachineTagVagrant do
           tag_helper.should_receive(:write_tag_file).with(tags_array.push(tag))
           tag_helper.create(tag)
 
-          tag_helper.list['test:tags'].should == 'foo'
+          tag_helper.list['test:tags'].first.should == tag
         end
       end
 
@@ -84,6 +84,8 @@ describe Chef::MachineTagVagrant do
         it "should not create a duplicate tag" do
           tag_helper.should_receive(:write_tag_file).with(tags_array)
           tag_helper.create('appserver:active=true')
+
+          tag_helper.list['appserver:active'].length.should == 1
         end
       end
     end
@@ -103,7 +105,7 @@ describe Chef::MachineTagVagrant do
 
     describe "#list" do
       it "should list tags" do
-        tag_helper.list['rs_login:state'].should == 'restricted'
+        tag_helper.list['rs_login:state'].first.should == 'rs_login:state=restricted'
       end
     end
 
@@ -114,13 +116,13 @@ describe Chef::MachineTagVagrant do
       end
 
       context "query tag exists in the system" do
-        it "should return array of tag hashes containing the query tag" do
+        it "should return array of tag sets containing the query tag" do
           tags = tag_helper.send(:do_query, 'server:private_ip_0')
           tags.should be_a(Array)
-          tags.first.should be_a(Hash)
+          tags.first.should be_a(MachineTag::Set)
 
-          expected_tag_hash = tag_helper.send(:create_tag_hash, JSON.parse(remote_tags))
-          tags.should == Array.new(2) { expected_tag_hash }
+          expected_tag_set = tag_helper.send(:create_tag_set, JSON.parse(remote_tags))
+          tags.should == Array.new(2) { expected_tag_set }
         end
       end
 

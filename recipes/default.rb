@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: fake
-# Recipe:: list_tags
+# Cookbook Name:: machine_tag
+# Recipe:: default
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,15 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe 'machine_tag::default'
+log "Installing 'machine_tag' gem"
 
-class Chef::Resource::RubyBlock
-  include Chef::MachineTagHelper
-end
-
-ruby_block "listing master tags" do
-  block do
-    tags_list = tag_list(node)
-    Chef::Log.info tags_list.inspect
-  end
-end
+gem_package 'machine_tag'

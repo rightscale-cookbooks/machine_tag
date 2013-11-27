@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+include_recipe 'machine_tag::default'
+
 machine_tag "master:login=restricted" do
   action :delete
 end

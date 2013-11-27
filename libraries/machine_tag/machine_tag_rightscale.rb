@@ -46,7 +46,7 @@ class Chef
     # @return [Hash{String => String}] the tags on the server
     #
     def list
-      create_tag_hash(JSON.parse(run_rs_tag_util("--list")))
+      create_tag_set(JSON.parse(run_rs_tag_util("--list")))
     end
 
 
@@ -56,15 +56,15 @@ class Chef
     #
     # @param query_string [String] the tags to be queried separated by a blank space
     #
-    # @return [Array<Hash{String => String}>] the tags on the servers that match the query
+    # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
     def do_query(query_string)
       tags_hash = JSON.parse(run_rs_tag_util("--query", query_string))
-      tags_hash_array = []
+      tags_set_array = []
       tags_hash.keys.each do |key|
-        tags_hash_array << create_tag_hash(tags_hash[key]['tags']) if tags_hash[key]['tags']
+        tags_set_array << create_tag_set(tags_hash[key]['tags']) if tags_hash[key]['tags']
       end
-      tags_hash_array
+      tags_set_array
     end
 
     private

@@ -6,3 +6,4 @@ description      'Installs/Configures machine_tag'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          IO.read(File.join(File.dirname(__FILE__), 'VERSION')) rescue '0.1.0'
 
+recipe 'machine_tag::default', "Installs the 'machine_tag' gem used by the helpers."
