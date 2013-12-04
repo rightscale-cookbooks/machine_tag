@@ -6,7 +6,7 @@ gem 'thor-scmversion'
 
 group :integration do
   gem 'machine_tag'
-  gem 'test-kitchen', '~> 1.0.0.beta.4'
+  gem 'test-kitchen', '~> 1.0.0'
   gem 'kitchen-vagrant'
   gem 'travis-lint'
   gem 'chefspec', '~> 2.0.1'

@@ -1,8 +1,8 @@
 ---
 driver_plugin: vagrant
-driver_config:
-  require_chef_omnibus: true
-  log_file: /var/log/chef-solo.log
+
+provisioner:
+  name: chef_solo
 
 platforms:
 - name: ubuntu-12.04
@@ -25,27 +25,29 @@ platforms:
 suites:
 - name: default
   run_list: ["recipe[machine_tag::default]"]
-
 - name: create
   run_list: ["recipe[fake::create_tags]"]
   attributes:
     cloud:
       provider: vagrant
-
 - name: delete
   run_list: ["recipe[fake::create_tags]", "recipe[fake::delete_tags]"]
   attributes:
     cloud:
       provider: vagrant
-
 - name: list
   run_list: ["recipe[fake::create_tags]", "recipe[fake::list_tags]"]
   attributes:
     cloud:
       provider: vagrant
-
+  provisioner:
+    solo_rb:
+      log_location: /var/log/chef-solo.log
 - name: search
   run_list: ["recipe[fake::create_tags]", "recipe[fake::search_tags]"]
   attributes:
     cloud:
       provider: vagrant
+  provisioner:
+    solo_rb:
+      log_location: /var/log/chef-solo.log
