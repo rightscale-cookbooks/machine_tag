@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: machine_tag
+# Cookbook Name:: fake
 # Recipe:: default
 #
 # Copyright (C) 2013 RightScale, Inc.
@@ -17,6 +17,5 @@
 # limitations under the License.
 #
 
-log "Installing 'machine_tag' gem"
-
-chef_gem 'machine_tag'
+# Make sure the machine_tag default recipe actually installs the machine tag gem in the compile phase
+require 'machine_tag'
