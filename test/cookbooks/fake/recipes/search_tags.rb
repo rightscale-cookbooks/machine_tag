@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe 'machine_tag::default'
-
 class Chef::Resource::RubyBlock
   include Chef::MachineTagHelper
 end
