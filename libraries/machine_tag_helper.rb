@@ -25,7 +25,7 @@ class Chef
   module MachineTag
 
     # Factory method for instantiating the correct machine tag class based on
-    # `node['cloud']['provider']` value. This value will be set to 'vagrant' on
+    # `node['cloud']['provider']` value. This value will be set to `'vagrant'` on
     # Vagrant environments.
     #
     # @param node [Chef::Node] the chef node
@@ -88,12 +88,11 @@ class Chef
 
   module MachineTagHelper
     # Return the list of tags for all server that match the query. An optional
-    # +:required_tags+ key can be passed into the `options` hash which will requery
-    # for the tags until they become available in one of the servers.
+    # `:required_tags` key can be passed into the `options` hash which will requery
+    # for the tags until they become available.
     #
     # @param node [Chef::Node] the chef node
-    # @param query_tags [Array<String>] the list of tags to be queried
-    # @param options [Hash{String => String, Integer}] the optional parameters for queries
+    # @param query_tags [String, Array<String>] the tag or list of tags to be queried
     #
     # @option options [Array] :required_tags the tags required to available in the query result
     # @option options [Integer] :query_timeout (2) the timeout value (in minutes) for the query.

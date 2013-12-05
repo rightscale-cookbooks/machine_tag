@@ -54,15 +54,14 @@ class Chef
 
     # Returns the list of tags for all server that match the query.
     #
-    # @param query_tags [Array<String>] the tags to be queried
-    # @param options [Hash{String => String, Integer}] the optional parameters for the query
+    # @param query_tags [String, Array<String>] the tag or list of tags to search for
     #
     # @option options [Array<String>] :required_tags the tags that should be found by the query.
     #   If the tags are not found at the time of the query, re-query until they are found or the timeout is reached
     # @option options [Integer] :query_timeout (2) the timeout for the query operation
     #
     # @return [Array<MachineTag::Set>] the array of all tags on the servers that
-    # match the query
+    #   match the query
     #
     # @raise [Timeout::Error] if the required tags could not be found within the time
     #
