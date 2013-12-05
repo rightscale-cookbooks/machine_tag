@@ -117,18 +117,18 @@ describe Chef::MachineTagVagrant do
 
       context "query tag exists in the system" do
         it "should return array of tag sets containing the query tag" do
-          tags = tag_helper.send(:do_query, 'server:private_ip_0')
+          tags = tag_helper.send(:do_query, ['server:private_ip_0'])
           tags.should be_a(Array)
           tags.first.should be_a(MachineTag::Set)
 
-          expected_tag_set = tag_helper.send(:create_tag_set, JSON.parse(remote_tags))
+          expected_tag_set = ::MachineTag::Set.new(JSON.parse(remote_tags))
           tags.should == Array.new(2) { expected_tag_set }
         end
       end
 
       context "query tag does not exist in the system" do
         it "should return empty array" do
-          tags = tag_helper.send(:do_query, 'server:something=*')
+          tags = tag_helper.send(:do_query, ['server:something=*'])
           tags.should be_a(Array)
           tags.should be_empty
         end

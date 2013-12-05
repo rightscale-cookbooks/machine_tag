@@ -18,35 +18,42 @@
 #
 
 require 'spec_helper'
-require 'machine_tag'
 
 describe Chef::MachineTagBase do
   MAX_SLEEP_INTERVAL = 60
 
   let(:base) { Chef::MachineTagBase.new }
-  let(:tags) do
-    <<-EOF
-      [
-        "database:active=true",
-        "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
-        "rs_login:state=restricted",
-        "rs_monitoring:state=active",
-        "server:private_ip_0=10.100.0.12",
-        "server:public_ip_0=157.56.165.202",
-        "server:uuid=01-83PJQDO8911IT",
-        "terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013"
-      ]
-    EOF
+
+  before do
+    Kernel.stub(:sleep) {|seconds| seconds}
   end
 
   describe "#search" do
-    let(:tag_set) { base.send(:create_tag_set, JSON.parse(tags)) }
+    let(:tag_set) do
+      ::MachineTag::Set[
+        'database:active=true',
+        'rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT',
+        'rs_login:state=restricted',
+        'rs_monitoring:state=active',
+        'server:private_ip_0=10.100.0.12',
+        'server:public_ip_0=157.56.165.202',
+        'server:uuid=01-83PJQDO8911IT',
+        'terminator:discovery_time=Tue Jun 04 22:07:12 +0000 2013'
+      ]
+    end
 
     context "when no query options are specified" do
       it "should do a query and return the tags matching the query" do
-        base.should_receive(:do_query).with('database:active=true').and_return([tag_set])
+        base.should_receive(:do_query).with(['database:active=true']).and_return([tag_set])
 
         search_output = base.search('database:active=true')
+        search_output.should == [tag_set]
+
+        base.should_receive(:do_query).with([
+          'database:active=true', 'rs_monitoring:state=active'
+        ]).and_return([tag_set])
+
+        search_output = base.search(['database:active=true', 'rs_monitoring:state=active'])
         search_output.should == [tag_set]
       end
     end
@@ -54,22 +61,22 @@ describe Chef::MachineTagBase do
     context "when query options are specified" do
       context "when 'required_tags' appear in query before query timeout" do
         it "should re-query until 'required_tags' are found in the query" do
-          tag_set_1 = tag_set.union(['database:master=true'])
-          tag_set_2 = tag_set_1.union(['database:repl=active'])
           # Mimic a scenario where the required_tags are not found in the query
           # initially, but appears in the query sometime later
-          base.should_receive(:do_query).with('database:active=true').at_least(:once).and_return(
+          tag_set_partial = tag_set.union(['database:master=true'])
+          tag_set_full = tag_set_partial.union(['database:repl=active'])
+          base.should_receive(:do_query).with(['database:active=true']).exactly(4).and_return(
             [tag_set],
-            [tag_set_1],
-            [tag_set_1],
-            [tag_set_2]
+            [tag_set_partial],
+            [tag_set_partial],
+            [tag_set_full]
           )
 
           query_options = {
             :required_tags => ['database:master=true', 'database:repl=active']
           }
           search_output = base.search('database:active=true', query_options)
-          search_output.should == [tag_set_2]
+          search_output.should == [tag_set_full]
         end
       end
 
@@ -77,7 +84,7 @@ describe Chef::MachineTagBase do
         it "should raise a Timeout exception" do
           query_tag = 'database:active=true'
 
-          base.should_receive(:do_query).with(query_tag).at_least(:once).and_return([tag_set])
+          base.should_receive(:do_query).with([query_tag]).at_least(:once).and_return([tag_set])
 
           query_options = {
             :required_tags => ['database:master=true'],
@@ -134,8 +141,8 @@ describe Chef::MachineTagBase do
   describe "#detect_tag" do
     let(:tag_set_array) do
       [
-        MachineTag::Set.new(['rs_login:state=true', 'rs_monitoring:state=active']),
-        MachineTag::Set.new(['rs_login:state=restricted'])
+        MachineTag::Set['rs_login:state=true', 'rs_monitoring:state=active'],
+        MachineTag::Set['rs_login:state=restricted'],
       ]
     end
 
@@ -157,15 +164,6 @@ describe Chef::MachineTagBase do
         output_array = base.send(:detect_tag, tag_set_array, 'some:state=*')
         output_array.should be_empty
       end
-    end
-  end
-
-  describe "#create_tag_set" do
-    it "should create a tag set" do
-      output_set = base.send(:create_tag_set, ['some:tag=1', 'foo:bar=2+5 = 7'])
-
-      output_set.should include('some:tag=1')
-      output_set.should include('foo:bar=2+5 = 7')
     end
   end
 end

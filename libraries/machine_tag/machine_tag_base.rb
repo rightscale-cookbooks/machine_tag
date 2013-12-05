@@ -58,7 +58,7 @@ class Chef
     #
     # @option options [Array<String>] :required_tags the tags that should be found by the query.
     #   If the tags are not found at the time of the query, re-query until they are found or the timeout is reached
-    # @option options [Integer] :query_timeout (2) the timeout for the query operation
+    # @option options [Integer] :query_timeout (120) the seconds to timeout for the query operation
     #
     # @return [Array<MachineTag::Set>] the array of all tags on the servers that
     #   match the query
@@ -66,15 +66,16 @@ class Chef
     # @raise [Timeout::Error] if the required tags could not be found within the time
     #
     def search(query_tags, options = {})
+      query_tags = [query_tags] if query_tags.kind_of?(String)
       tags_set_array = do_query(query_tags)
 
       unless options[:required_tags].nil? || options[:required_tags].empty?
         # Set timeout for querying for required_tags. By default, the timeout is set
         # for 120 seconds if no timeouts specified.
-        timeout_sec = options[:query_timeout] ? options[:query_timeout].to_i * 60 : DEFAULT_QUERY_TIMEOUT
+        query_timeout = options[:query_timeout] ? options[:query_timeout] : DEFAULT_QUERY_TIMEOUT
 
         begin
-          Timeout::timeout(timeout_sec) do
+          Timeout::timeout(query_timeout) do
             options[:required_tags].each do |tag|
               sleep_sec = 1
               # Check if the tag is found in all the servers in the query result. If not, re-query
@@ -82,7 +83,7 @@ class Chef
                 # Calculate wait interval for re-querying
                 sleep_sec = sleep_interval(sleep_sec)
                 Chef::Log.info "'#{tag}' is not available yet. Waiting for #{sleep_sec} seconds..."
-                sleep sleep_sec
+                Kernel.sleep(sleep_sec)
 
                 Chef::Log.info "Re-querying for '#{tag}'..."
                 tags_set_array = do_query(query_tags)
@@ -90,7 +91,7 @@ class Chef
             end
           end
         rescue Timeout::Error => e
-          raise e, "Requested tags could not be found within #{timeout_sec} seconds"
+          raise e, "Requested tags could not be found within #{query_timeout} seconds"
         end
       end
       tags_set_array
@@ -106,7 +107,7 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the list of all tags on the servers that match the query
     #
-    def do_query(*query_tags)
+    def do_query(query_tags)
       not_implemented
     end
 
@@ -115,16 +116,6 @@ class Chef
     # Use the MachineTag.factory method to create this class.
     #
     def initalize; end
-
-    # Creates a machine_tag set from the given array of tags.
-    #
-    # @param tags_array [Array<String>] the array of tags
-    #
-    # @return [MachineTag::Set] the tag set
-    #
-    def create_tag_set(tags_array)
-      ::MachineTag::Set.new(tags_array)
-    end
 
     # Checks if a tag exists in the array of tag sets.
     #
@@ -165,10 +156,9 @@ class Chef
     #
     def valid_tag_query?(tag)
       if tag.machine_tag?
-        return false if tag.value.include?('*') && tag.value.index('*') != 0
+        return false if tag.value.include?('*') && tag.value != '*'
       else
-        return false unless tag =~ ::MachineTag::NAMESPACE_AND_PREDICATE
-        return false if tag.include?('*')
+        return false unless tag =~ /^#{::MachineTag::NAMESPACE_AND_PREDICATE}$/
       end
       true
     end

@@ -40,20 +40,40 @@ describe Chef::MachineTagHelper do
   let(:tag_set) { MachineTag::Set['foo:bar=true', 'namespace:predicate=value'] }
 
   describe ".tag_search" do
-    it "should search the given tags and return an array of tag sets" do
-      query_tags = ['namespace:predicate=value', 'foo:bar=true']
+    it "should search for the given tag(s) and return an array of tag sets" do
+      query_tag = 'namespace:predicate=value'
+      query_tags = [query_tag, 'foo:bar=true']
 
-      Chef::MachineTag.should_receive(:factory).with(node).and_return(env_stub)
+      Chef::MachineTag.should_receive(:factory).at_least(2).with(node).and_return(env_stub)
+
+      env_stub.should_receive(:search).with(query_tag, {}).and_return([tag_set])
+      tags = fake.tag_search(node, query_tag)
+      tags.should be_instance_of(Array)
+      tags.first.should be_instance_of(MachineTag::Set)
+      tags.first.should == tag_set
+
       env_stub.should_receive(:search).with(query_tags, {}).and_return([tag_set])
-      fake.tag_search(node, query_tags)
+      tags = fake.tag_search(node, query_tags)
+      tags.should be_instance_of(Array)
+      tags.first.should be_instance_of(MachineTag::Set)
+      tags.first.should == tag_set
 
       options = {
         :required_tags => ['foo:bar'],
         :query_timeout => 5
       }
-      Chef::MachineTag.should_receive(:factory).with(node).and_return(env_stub)
+
+      env_stub.should_receive(:search).with(query_tag, options).and_return([tag_set])
+      tags = fake.tag_search(node, query_tag, options)
+      tags.should be_instance_of(Array)
+      tags.first.should be_instance_of(MachineTag::Set)
+      tags.first.should == tag_set
+
       env_stub.should_receive(:search).with(query_tags, options).and_return([tag_set])
-      fake.tag_search(node, query_tags, options)
+      tags = fake.tag_search(node, query_tags, options)
+      tags.should be_instance_of(Array)
+      tags.first.should be_instance_of(MachineTag::Set)
+      tags.first.should == tag_set
     end
   end
 
@@ -62,7 +82,9 @@ describe Chef::MachineTagHelper do
       Chef::MachineTag.should_receive(:factory).with(node).and_return(env_stub)
       env_stub.should_receive(:list).and_return(tag_set)
 
-      fake.tag_list(node)
+      tags = fake.tag_list(node)
+      tags.should be_instance_of(MachineTag::Set)
+      tags.should == tag_set
     end
   end
 end

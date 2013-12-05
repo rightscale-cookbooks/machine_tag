@@ -51,7 +51,7 @@ class Chef
     # @return [MachineTag::Set] the tags on the VM
     #
     def list
-      create_tag_set(read_tag_file(@tag_file))
+      ::MachineTag::Set.new(read_tag_file(@tag_file))
     end
 
     protected
@@ -62,7 +62,7 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the tags on the VMs that match the query
     #
-    def do_query(*query_tags)
+    def do_query(query_tags)
       query_result = []
 
       # Return empty array if no tags are found in the query string
@@ -72,7 +72,7 @@ class Chef
       all_vm_tag_dirs.each do |tag_dir|
         tags_array = read_tag_file(::File.join(tag_dir, TAGS_JSON_FILE))
         if tags_array
-          tags_set_array = [create_tag_set(tags_array)]
+          tags_set_array = [::MachineTag::Set.new(tags_array)]
 
           # If at least one of the tags in the query is found in the VM
           # select the VM

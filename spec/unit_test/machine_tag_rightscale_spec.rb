@@ -100,7 +100,7 @@ describe Chef::MachineTagRightscale do
     it "should return an array of tag sets containing the query tag" do
       tag_helper.should_receive(:run_rs_tag_util).with('--query', 'database:active=true').and_return(rs_raw_output)
 
-      tags = tag_helper.send(:do_query, 'database:active=true')
+      tags = tag_helper.send(:do_query, ['database:active=true'])
       tags.should be_a(Array)
       tags.first.should be_a(MachineTag::Set)
 
