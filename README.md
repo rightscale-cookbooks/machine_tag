@@ -9,9 +9,9 @@ search [machine tags][Tagging] in the Vagrant and RightScale environments.
 
 # Requirements
 
- * [machine_tag](https://github.com/douglaswth/machine_tag) gem which provides a library 
-   for using machine tags.
- * Bundler
+ * [machine_tag] gem which provides a library for using machine tags.
+
+[machine_tag]: https://rubygems.org/gems/machine_tag
 
 ## Vagrant Environment
 
@@ -57,7 +57,7 @@ RightScale managed VM to have the required access to the [rs_tag utility][rs_tag
 
 ## default
 
-Installs the [machine_tag](https://github.com/douglaswth/machine_tag) gem on the server.
+Installs the [machine_tag] gem.
 
 
 # Resource/Provider
