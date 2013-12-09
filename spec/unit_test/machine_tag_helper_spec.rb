@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: machine_tag
-# Spec:: machine_tag_spec
+# Spec:: machine_tag_helper_spec
 #
 # Copyright (C) 2013 RightScale, Inc.
 #

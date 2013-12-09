@@ -17,5 +17,5 @@
 # limitations under the License.
 #
 
-# Make sure the machine_tag default recipe actually installs the machine tag gem in the compile phase
+# Make sure the machine_tag::default recipe actually installs the 'machine_tag' gem in the compile phase
 require 'machine_tag'

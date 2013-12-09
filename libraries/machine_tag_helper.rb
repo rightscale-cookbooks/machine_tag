@@ -42,7 +42,7 @@ class Chef
       end
 
       if node['cloud'].nil? || node['cloud']['provider'].nil?
-        raise "ERROR: could not detect a supported machine tag environment."
+        raise "Could not detect a supported machine tag environment."
       elsif node['cloud']['provider'] == 'vagrant'
         # This is a Vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
@@ -76,7 +76,7 @@ class Chef
       return node['hostname'], node['machine_tag']['vagrant_tag_cache_dir']
     end
 
-    # Raises an {#ArgumentError} with a custom error message.
+    # Raises an `ArgumentError` with a custom error message.
     #
     # @param message [String] the error message
     #

@@ -46,7 +46,7 @@ class Chef
 
     # Lists all the tags for this server.
     #
-    # @return [Hash{String => String}] the list of tags
+    # @return [MachineTag::Set] the list of tags
     #
     def list
       not_implemented
@@ -165,7 +165,7 @@ class Chef
 
     # Calculates the interval for re-querying tags. For every re-query the interval
     # is increased exponentially until the interval reaches the maximum limit of
-    # {#MAX_SLEEP_INTERVAL}.
+    # `MAX_SLEEP_INTERVAL`.
     #
     # @param delay [Integer] the current sleep interval
     #
