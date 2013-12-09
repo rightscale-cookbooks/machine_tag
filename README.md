@@ -135,12 +135,12 @@ Returns an array of tag hashes for all servers in your environment that matches 
   <tr>
     <td>query</td>
     <td>the tags to be queried (multiple tags are space delimited)</td>
-    <td>String</td>
+    <td><tt>String</tt></td>
   </tr>
   <tr>
     <td>options</td>
     <td>optional parameters to the query</td>
-    <td>Hash</td>
+    <td><tt>Hash</tt></td>
   </tr>
 </table>
 
