@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+require_relative 'machine_tag_base'
+
 require 'json'
 require 'chef/mixin/shell_out'
 
