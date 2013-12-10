@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-require 'machine_tag_rightscale'
-require 'machine_tag_vagrant'
+require_relative 'machine_tag_rightscale'
+require_relative 'machine_tag_vagrant'
 
 class Chef
   module MachineTag

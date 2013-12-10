@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-require 'machine_tag_base'
+require_relative 'machine_tag_base'
 
 require 'json'
 
