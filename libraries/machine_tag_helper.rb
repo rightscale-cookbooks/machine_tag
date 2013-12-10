@@ -17,9 +17,8 @@
 # limitations under the License.
 #
 
-require File.join(File.dirname(__FILE__), "machine_tag", "machine_tag_base.rb")
-require File.join(File.dirname(__FILE__), "machine_tag", "machine_tag_rightscale.rb")
-require File.join(File.dirname(__FILE__), "machine_tag", "machine_tag_vagrant.rb")
+require 'machine_tag_rightscale'
+require 'machine_tag_vagrant'
 
 class Chef
   module MachineTag
