@@ -202,7 +202,7 @@ tags = tag_list(node, 'test:tag=foo foo:bar=* some:tag')
 
 # Attributes
 
-`node['machine_tag']['vagrant_tag_cache_dir']` : where to store the tag data for each server. 
+* `node['machine_tag']['vagrant_tag_cache_dir']` - path to store the tag data for each server.
   Only used in Vagrant environments. This should match a `config.vm.synced_folder` entry in your Vagrantfile for
   `tag_search()` to work across VMs. See the `Vagrantfile` for an example.
 
