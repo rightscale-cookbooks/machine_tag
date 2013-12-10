@@ -25,17 +25,24 @@ class Chef
   module MachineTag
 
     # Factory method for instantiating the correct machine tag class based on
-    # `node['cloud']['provider']` value. This value will be set to 'vagrant' on
+    # `node['cloud']['provider']` value. This value will be set to `'vagrant'` on
     # Vagrant environments.
     #
     # @param node [Chef::Node] the chef node
     #
-    # @return [Chef::MachineTagVagrant, Chef::MachineTagRightscale] the instance corresponding to
+    # @return [Chef::MachineTagBase] the instance corresponding to
     #   the machine tag environment
     #
     def self.factory(node)
+      begin
+        require 'machine_tag'
+      rescue LoadError => e
+        raise e, "'machine_tag' gem is not installed!" +
+          " Run the 'machine_tag::default' recipe first to install this gem."
+      end
+
       if node['cloud'].nil? || node['cloud']['provider'].nil?
-        raise "ERROR: could not detect a supported machine tag environment."
+        raise "Could not detect a supported machine tag environment."
       elsif node['cloud']['provider'] == 'vagrant'
         # This is a Vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
@@ -69,7 +76,7 @@ class Chef
       return node['hostname'], node['machine_tag']['vagrant_tag_cache_dir']
     end
 
-    # Raises an {#ArgumentError} with a custom error message.
+    # Raises an `ArgumentError` with a custom error message.
     #
     # @param message [String] the error message
     #
@@ -81,23 +88,26 @@ class Chef
 
   module MachineTagHelper
     # Return the list of tags for all server that match the query. An optional
-    # +:required_tags+ key can be passed into the `options` hash which will requery
-    # for the tags until they become available in one of the servers.
+    # `:required_tags` key can be passed into the `options` hash which will requery
+    # for the tags until they become available.
     #
     # @param node [Chef::Node] the chef node
-    # @param query [Array] the list of tags to be queried
-    # @param options [Hash{String => String, Integer}] the optional parameters for queries
+    # @param query_tags [String, Array<String>] the tag or list of tags to be queried
     #
     # @option options [Array] :required_tags the tags required to available in the query result
-    # @option options [Integer] :query_timeout (2) the timeout value (in minutes) for the query.
+    # @option options [Integer] :query_timeout (120) the seconds to timeout for the query operation
     #
-    def tag_search(node, query, options = {})
-      Chef::MachineTag.factory(node).search(query, options)
+    # @return [Array<MachineTag::Set>] the array of all tags on the servers that matched the query tags
+    #
+    def tag_search(node, query_tags, options = {})
+      Chef::MachineTag.factory(node).search(query_tags, options)
     end
 
-    # Returns a hash of all tags on the current server.
+    # Returns a set of all tags on the current server.
     #
     # @param node [Chef::Node] the chef node
+    #
+    # @return [MachineTag::Set] the set of all tags on the server
     #
     def tag_list(node)
       Chef::MachineTag.factory(node).list

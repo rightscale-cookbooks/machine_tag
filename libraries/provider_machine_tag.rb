@@ -27,7 +27,7 @@ require 'machine_tag_helper.rb'
 class Chef
   class Provider
     class MachineTag < Chef::Provider
-      # Finds an existing machine_tag resource on the node based on machine_tag name
+      # Finds an existing `machine_tag` resource on the node based on `machine_tag` name
       # and loads the current resource with the attributes on the node.
       #
       # @return [Chef::Resource::MachineTag] the resource found in the node

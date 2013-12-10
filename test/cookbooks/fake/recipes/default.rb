@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: machine_tag
-# Spec:: spec_helper
+# Cookbook Name:: fake
+# Recipe:: default
 #
 # Copyright (C) 2013 RightScale, Inc.
 #
@@ -17,11 +17,5 @@
 # limitations under the License.
 #
 
-lib = File.expand_path('../../libraries', __FILE__)
-$:.unshift(lib) unless $:.include?(lib)
-
-require 'chefspec'
-require 'machine_tag_helper'
-require 'provider_machine_tag'
-require 'resource_machine_tag'
+# Make sure the machine_tag::default recipe actually installs the 'machine_tag' gem in the compile phase
 require 'machine_tag'

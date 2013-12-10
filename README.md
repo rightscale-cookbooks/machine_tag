@@ -9,12 +9,15 @@ search [machine tags][Tagging] in the Vagrant and RightScale environments.
 
 # Requirements
 
+ * [machine_tag] gem which provides a library for using machine tags.
+
+[machine_tag]: https://rubygems.org/gems/machine_tag
+
 ## Vagrant Environment
 
 For using this resource in a *Vagrant environment* install the following
 
  * Vagrant 1.2+
- * Bundler
  * Bindler
 
 This resource detects a Vagrant environment when the `node['cloud']['provider']` is set to
@@ -48,6 +51,13 @@ For using this resource in a *RightScale Environment*, the system must be a
 RightScale managed VM to have the required access to the [rs_tag utility][rs_tag].
 
 [rs_tag]: http://support.rightscale.com/12-Guides/RightLink/01-RightLink_Overview/RightLink_Command_Line_Utilities#rs_tag
+
+
+# Recipes
+
+## default
+
+Installs the [machine_tag] gem.
 
 
 # Resource/Provider
@@ -120,17 +130,17 @@ Returns an array of tag hashes for all servers in your environment that matches 
   <tr>
     <td>node</td>
     <td>the environment (Vagrant or RightScale)</td>
-    <td>`Chef::Node`</td>
+    <td><tt>Chef::Node</tt></td>
   </tr>
   <tr>
     <td>query</td>
     <td>the tags to be queried (multiple tags are space delimited)</td>
-    <td>String</td>
+    <td><tt>String</tt></td>
   </tr>
   <tr>
     <td>options</td>
     <td>optional parameters to the query</td>
-    <td>Hash</td>
+    <td><tt>Hash</tt></td>
   </tr>
 </table>
 
@@ -147,7 +157,7 @@ Returns a tag hash for the current server.
   <tr>
     <td>node</td>
     <td>the environment (Vagrant or RightScale)</td>
-    <td>`Chef::Node`</td>
+    <td><tt>Chef::Node</tt></td>
   </tr>
 </table>
 

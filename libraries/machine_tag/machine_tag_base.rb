@@ -46,7 +46,7 @@ class Chef
 
     # Lists all the tags for this server.
     #
-    # @return [Hash{String => String}] the list of tags
+    # @return [MachineTag::Set] the list of tags
     #
     def list
       not_implemented
@@ -54,47 +54,47 @@ class Chef
 
     # Returns the list of tags for all server that match the query.
     #
-    # @param query_string [String] the tags separated by space that should be queried
-    # @param options [Hash{String => String, Integer}] the optional parameters for the query
+    # @param query_tags [String, Array<String>] the tag or list of tags to search for
     #
     # @option options [Array<String>] :required_tags the tags that should be found by the query.
     #   If the tags are not found at the time of the query, re-query until they are found or the timeout is reached
-    # @option options [Integer] :query_timeout (2) the timeout for the query operation
+    # @option options [Integer] :query_timeout (120) the seconds to timeout for the query operation
     #
-    # @return [Array<Hash{String => String}>] the array of all tags (in hash format)
-    # on the servers that match the query
+    # @return [Array<MachineTag::Set>] the array of all tags on the servers that
+    #   match the query
     #
     # @raise [Timeout::Error] if the required tags could not be found within the time
     #
-    def search(query_string, options = {})
-      tags_hash_array = do_query(query_string)
+    def search(query_tags, options = {})
+      query_tags = [query_tags] if query_tags.kind_of?(String)
+      tags_set_array = do_query(query_tags)
 
       unless options[:required_tags].nil? || options[:required_tags].empty?
         # Set timeout for querying for required_tags. By default, the timeout is set
         # for 120 seconds if no timeouts specified.
-        timeout_sec = options[:query_timeout] ? options[:query_timeout].to_i * 60 : DEFAULT_QUERY_TIMEOUT
+        query_timeout = options[:query_timeout] ? options[:query_timeout] : DEFAULT_QUERY_TIMEOUT
 
         begin
-          Timeout::timeout(timeout_sec) do
+          Timeout::timeout(query_timeout) do
             options[:required_tags].each do |tag|
               sleep_sec = 1
               # Check if the tag is found in all the servers in the query result. If not, re-query
-              while detect_tag(tags_hash_array, tag).length != tags_hash_array.length
+              while detect_tag(tags_set_array, tag).length != tags_set_array.length
                 # Calculate wait interval for re-querying
                 sleep_sec = sleep_interval(sleep_sec)
                 Chef::Log.info "'#{tag}' is not available yet. Waiting for #{sleep_sec} seconds..."
-                sleep sleep_sec
+                Kernel.sleep(sleep_sec)
 
                 Chef::Log.info "Re-querying for '#{tag}'..."
-                tags_hash_array = do_query(query_string)
+                tags_set_array = do_query(query_tags)
               end
             end
           end
         rescue Timeout::Error => e
-          raise e, "Requested tags could not be found within #{timeout_sec} seconds"
+          raise e, "Requested tags could not be found within #{query_timeout} seconds"
         end
       end
-      tags_hash_array
+      tags_set_array
     end
 
 
@@ -103,11 +103,11 @@ class Chef
     # Queries for a specific tag on all servers and returns all the tags on the servers
     # that match the query.
     #
-    # @param query_string [String] the tags to be queried separated by blank space
+    # @param query_tags [Array<String>] the tags to be queried
     #
-    # @return [Array<Hash{String => String}>] the list of all tags on the servers that match the query
+    # @return [Array<MachineTag::Set>] the list of all tags on the servers that match the query
     #
-    def do_query(query_string = '')
+    def do_query(query_tags)
       not_implemented
     end
 
@@ -117,61 +117,37 @@ class Chef
     #
     def initalize; end
 
-    # Breaks up tags into <key, value> pairs where the key contains
-    # "namespace:predicate" and value contains the tag value.
+    # Checks if a tag exists in the array of tag sets.
     #
-    # @param tags_array [Array<String>] the array of tags
-    #
-    # @return [Hash{String => String}] the tag hash
-    #
-    def create_tag_hash(tags_array)
-      tags_hash = {}
-      tags_array.each do |tag|
-        namespace_predicate, value = split_tag(tag)
-        tags_hash[namespace_predicate] = value
-      end
-      tags_hash
-    end
-
-    # Splits a tag into 'namespace:predicate' and 'value'.
-    #
-    # @param tag [String] the tag to be split
-    #
-    # @return [String] the 'namespace:predicate' and the 'value'
-    #
-    def split_tag(tag)
-      # If there are more than one '=' sign in 'value', split the tag on the
-      # first '=' sign
-      tag.split('=', 2)
-    end
-
-    # Checks if a tag exists in the array of tag hashes.
-    #
-    # @param tags_hash_array [Array<Hash{String => String}>] the array of tag hashes
+    # @param tags_set_array [Array<MachineTag::Set>] the array of tag hashes
     #   to be looked up
     # @param tag [String] the tag to search
     #
-    # @return [Array] the array of tag hashes that contains the tag, otherwise
+    # @return [Array<MachineTag::Set>] the array of tag sets that contains the tag, otherwise
     # empty array if tag does not exist
     #
     # @raise [RuntimeError] if the queried tag is not a valid query
     #
-    def detect_tag(tags_hash_array, tag)
+    def detect_tag(tags_set_array, tag)
+      tag = ::MachineTag::Tag.new(tag)
       raise "#{tag} is not a valid tag query!" unless valid_tag_query?(tag)
 
-      key, value = split_tag(tag)
-      tags_hash_array.select do |tags_hash|
-        # If tag value is a wildcard, select tags that match the namespace:predicate (key)
-        # else, detect tags that match both namespace:predicate and the value
-        if value == '*' || value.nil?
-          tags_hash.keys.include?(key)
+      tags_set_array.select do |tags_set|
+        if tag.machine_tag?
+          if tag.value.include?('*')
+            tags_set[tag.namespace_and_predicate]
+          else
+            tags_set.include?(tag)
+          end
         else
-          tags_hash.keys.include?(key) && tags_hash[key] == value
+          tags_set[tag]
         end
       end
     end
 
-    # Validates the tag passed into the query.
+    # Validates the given tag with the machine tag regex rules.
+    #
+    # @param tag [MachineTag::Tag] the tag to be validated
     #
     # @see http://support.rightscale.com/12-Guides/RightLink/01-RightLink_Overview/RightLink_Command_Line_Utilities#rs_tag
     #   rs_tag Command Line Utility
@@ -179,15 +155,17 @@ class Chef
     # @return [Boolean] true if the tag query is valid, false otherwise
     #
     def valid_tag_query?(tag)
-      # See http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging
-      # for tag syntax rules.
-      #
-      tag =~ /^[a-zA-Z]\w*:[a-zA-Z]\w*(=(\*|[^*]+))?$/ ? true : false
+      if tag.machine_tag?
+        return false if tag.value.include?('*') && tag.value != '*'
+      else
+        return false unless tag =~ /^#{::MachineTag::NAMESPACE_AND_PREDICATE}$/
+      end
+      true
     end
 
     # Calculates the interval for re-querying tags. For every re-query the interval
     # is increased exponentially until the interval reaches the maximum limit of
-    # {#MAX_SLEEP_INTERVAL}.
+    # `MAX_SLEEP_INTERVAL`.
     #
     # @param delay [Integer] the current sleep interval
     #
