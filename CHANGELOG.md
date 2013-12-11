@@ -7,7 +7,7 @@ This file is used to list changes made in each version of the machine_tag cookbo
 v1.0.1
 ------
 
-- Fix for packaged cookbook on Chef community side (Pull Request [#3][])
+- Fix for packaged cookbook on Chef community site (Pull Request [#3][])
 
 v1.0.0
 ------
