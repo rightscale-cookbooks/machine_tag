@@ -88,6 +88,7 @@ Vagrant.configure("2") do |config|
         },
       }
       chef.run_list = [
+        "recipe[machine_tag]",
         "recipe[fake::create_tags]",
         "recipe[fake::list_tags]"
       ]
@@ -113,6 +114,7 @@ Vagrant.configure("2") do |config|
         },
       }
       chef.run_list = [
+        "recipe[machine_tag]",
         "recipe[fake::search_tags]",
         "recipe[fake::delete_tags]"
       ]
