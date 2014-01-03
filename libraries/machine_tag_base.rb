@@ -22,11 +22,11 @@ class Chef
 
     # Default query timeout (in seconds)
     #
-    DEFAULT_QUERY_TIMEOUT = 120
+    DEFAULT_QUERY_TIMEOUT = 120 unless const_defined?(:DEFAULT_QUERY_TIMEOUT)
 
     # Maximum value for sleep interval (in seconds) when re-querying tags
     #
-    MAX_SLEEP_INTERVAL = 60
+    MAX_SLEEP_INTERVAL = 60 unless const_defined?(:MAX_SLEEP_INTERVAL)
 
     # Creates a tag for this server.
     #
