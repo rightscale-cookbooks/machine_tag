@@ -197,7 +197,7 @@ class Chef::Recipe
   include Chef::MachineTagHelper
 end
 
-tags = tag_list(node, 'test:tag=foo foo:bar=* some:tag')
+tags = tag_search(node, 'test:tag=foo foo:bar=* some:tag')
 ```
 
 # Attributes
