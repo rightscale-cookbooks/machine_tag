@@ -5,11 +5,18 @@
 This cookbook provides a `machine_tag` resource that can create, delete, list, and
 search [machine tags][Tagging] in the Vagrant and RightScale environments. 
 
+Github Repository: [https://github.com/rightscale-cookbooks/machine_tag](https://github.com/rightscale-cookbooks/machine_tag)
+
 [Tagging]: http://support.rightscale.com/12-Guides/RightScale_101/06-Advanced_Concepts/Tagging
 
 # Requirements
 
  * [machine_tag] gem which provides a library for using machine tags.
+ * Platform
+   * Ubuntu 12.04
+   * Ubuntu 10.04
+   * CentOS 6.4
+   * CentOS 5.9
 
 [machine_tag]: https://rubygems.org/gems/machine_tag
 
@@ -197,7 +204,7 @@ class Chef::Recipe
   include Chef::MachineTagHelper
 end
 
-tags = tag_list(node, 'test:tag=foo foo:bar=* some:tag')
+tags = tag_search(node, 'test:tag=foo foo:bar=* some:tag')
 ```
 
 # Attributes
