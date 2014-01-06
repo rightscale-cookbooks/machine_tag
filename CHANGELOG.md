@@ -3,6 +3,12 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v1.0.2
+------
+
+- Updated README
+- Fix the already initialized constants warning
+- Updated Vagrantfile to work with Vagrant 1.3.x
 
 v1.0.1
 ------
