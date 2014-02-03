@@ -123,7 +123,7 @@ class Chef::Recipe
 end
 ```
 
-## tag_search(node, query, options)
+## tag_search(node, query, options = {})
 
 Returns an array of tag hashes for all servers in your environment that matches the query.
 
