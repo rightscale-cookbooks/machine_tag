@@ -135,12 +135,12 @@ class Chef
       tags_set_array.select do |tags_set|
         if tag.machine_tag?
           if tag.value.include?('*')
-            tags_set[tag.namespace_and_predicate]
+            !tags_set[tag.namespace_and_predicate].empty?
           else
             tags_set.include?(tag)
           end
         else
-          tags_set[tag]
+          !tags_set[tag].empty?
         end
       end
     end
