@@ -93,7 +93,7 @@ class Chef
     # @param node [Chef::Node] the chef node
     # @param query_tags [String, Array<String>] the tag or list of tags to be queried
     #
-    # @option options [Array] :required_tags the tags required to available in the query result
+    # @option options [Array<String>] :required_tags the tags required to available in the query result
     # @option options [Integer] :query_timeout (120) the seconds to timeout for the query operation
     #
     # @return [Array<MachineTag::Set>] the array of all tags on the servers that matched the query tags
