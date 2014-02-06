@@ -99,7 +99,7 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the array of all tags on the servers that matched the query tags
     #
-    def tag_search(node, query_tags, options = {})
+    def self.tag_search(node, query_tags, options = {})
       Chef::MachineTag.factory(node).search(query_tags, options)
     end
 
@@ -109,7 +109,7 @@ class Chef
     #
     # @return [MachineTag::Set] the set of all tags on the server
     #
-    def tag_list(node)
+    def self.tag_list(node)
       Chef::MachineTag.factory(node).list
     end
   end
