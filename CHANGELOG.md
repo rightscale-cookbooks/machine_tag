@@ -3,6 +3,12 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v1.0.3
+------
+
+- Accommodate changes from [machine_tag (v1.1.3)](http://rubygems.org/gems/machine_tag) gem
+- Add class methods in MachineTagHelper
+
 v1.0.2
 ------
 
