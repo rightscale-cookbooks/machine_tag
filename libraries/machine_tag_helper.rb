@@ -86,9 +86,9 @@ class Chef
   end
 
   module MachineTagHelper
-    # Return the list of tags for all server that match the query. An optional
-    # `:required_tags` key can be passed into the `options` hash which will requery
-    # for the tags until they become available.
+    # Helper method that returns the list of tags for all server that match the query.
+    # An optional `:required_tags` key can be passed into the `options` hash which will
+    # re-query for the tags until they become available.
     #
     # @param node [Chef::Node] the chef node
     # @param query_tags [String, Array<String>] the tag or list of tags to be queried
@@ -99,19 +99,34 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the array of all tags on the servers that matched the query tags
     #
-    def tag_search(node, query_tags, options = {})
+    def self.tag_search(node, query_tags, options = {})
       Chef::MachineTag.factory(node).search(query_tags, options)
     end
 
-    # Returns a set of all tags on the current server.
+    # Returns the list of tags for all servers that match the query.
+    #
+    # @see MachineTagHelper.tag_search
+    #
+    def tag_search(node, query_tags, options = {})
+      MachineTagHelper.tag_search(node, query_tags, options)
+    end
+
+    # Helper method that returns a set of all tags on the current server.
     #
     # @param node [Chef::Node] the chef node
     #
     # @return [MachineTag::Set] the set of all tags on the server
     #
-    def tag_list(node)
+    def self.tag_list(node)
       Chef::MachineTag.factory(node).list
     end
-  end
 
+    # Returns a set of all tags on the current server.
+    #
+    # @see MachineTagHelper.tag_list
+    #
+    def tag_list(node)
+      MachineTagHelper.tag_list(node)
+    end
+  end
 end

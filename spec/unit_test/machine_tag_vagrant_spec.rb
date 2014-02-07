@@ -98,7 +98,7 @@ describe Chef::MachineTagVagrant do
           tag_helper.should_receive(:write_tag_file).with(tags_array)
           tag_helper.delete(tag)
 
-          tag_helper.list['appserver:active'].should be_nil
+          tag_helper.list['appserver:active'].should be_empty
         end
       end
     end
