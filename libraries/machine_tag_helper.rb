@@ -20,8 +20,11 @@
 require_relative 'machine_tag_rightscale'
 require_relative 'machine_tag_vagrant'
 
+require 'chef/mixin/shell_out'
+
 class Chef
   module MachineTag
+    extend Chef::Mixin::ShellOut
 
     # Factory method for instantiating the correct machine tag class based on
     # `node['cloud']['provider']` value. This value will be set to `'vagrant'` on
@@ -40,15 +43,15 @@ class Chef
           " Run the 'machine_tag::default' recipe first to install this gem."
       end
 
-      if node['cloud'].nil? || node['cloud']['provider'].nil?
-        raise "Could not detect a supported machine tag environment."
-      elsif node['cloud']['provider'] == 'vagrant'
+      if shell_out('which', 'rs_tag').exitstatus == 0
+        # This is a RightScale environment
+        Chef::MachineTagRightscale.new
+      elsif node['cloud'] && node['cloud']['provider'] == 'vagrant'
         # This is a Vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
         Chef::MachineTagVagrant.new(hostname, cache_dir)
       else
-        # This is a RightScale environment
-        Chef::MachineTagRightscale.new
+        raise "Could not detect a supported machine tag environment."
       end
     end
 
