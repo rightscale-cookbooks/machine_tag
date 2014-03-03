@@ -71,12 +71,6 @@ class Chef
 
     private
 
-    # Asserts the `rs_tag` utility is in the path.
-    #
-    def assert_rightscale
-      shell_out!("which rs_tag")
-    end
-
     # Runs the `rs_tag` utility.
     #
     # @param args [Array<String>] the arguments for the utility
@@ -84,7 +78,6 @@ class Chef
     # @return [String] the output from the utility
     #
     def run_rs_tag_util(*args)
-      assert_rightscale
       cmd = ['rs_tag'] + args
       shell_out!(cmd).stdout
     end

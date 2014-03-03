@@ -55,11 +55,12 @@ describe Chef::MachineTag do
   end
 
   describe "::factory" do
-    context "cloud provider is not found in the node" do
-      it "should raise exception if cloud provider not found in the node" do
-        expect do
-          Chef::MachineTag.factory(node)
-        end.to raise_error(RuntimeError)
+    let(:shell_out) { Struct.new(:exitstatus) }
+
+    context "the rs_tag utility is in the path" do
+      it "should return an object of MachineTagRightscale class" do
+        Chef::MachineTag.should_receive(:shell_out).with('which', 'rs_tag').and_return(shell_out.new(0))
+        Chef::MachineTag.factory(node).should be_an_instance_of(Chef::MachineTagRightscale)
       end
     end
 
@@ -68,14 +69,17 @@ describe Chef::MachineTag do
         node.set['cloud']['provider'] = 'vagrant'
         node.set['hostname'] = 'some_host'
         node.set['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/machine_tag_cache/'
+        Chef::MachineTag.should_receive(:shell_out).with('which', 'rs_tag').and_return(shell_out.new(1))
         Chef::MachineTag.factory(node).should be_an_instance_of(Chef::MachineTagVagrant)
       end
     end
 
-    context "for other cloud providers" do
-      it "should return an object of MachineTagRightscale class" do
-        node.set['cloud']['provider'] = 'some_cloud'
-        Chef::MachineTag.factory(node).should be_an_instance_of(Chef::MachineTagRightscale)
+    context "the rs_tag utility is not in the path" do
+      it "should raise exception if cloud provider not found in the node" do
+        Chef::MachineTag.should_receive(:shell_out).with('which', 'rs_tag').and_return(shell_out.new(1))
+        expect do
+          Chef::MachineTag.factory(node)
+        end.to raise_error(RuntimeError)
       end
     end
   end

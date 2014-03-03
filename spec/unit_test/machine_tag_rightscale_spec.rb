@@ -67,13 +67,7 @@ describe Chef::MachineTagRightscale do
     EOF
   end
 
-  let(:node) do
-    node = Chef::Node.new
-    node.set['cloud']['provider'] = 'ec2'
-    node
-  end
-
-  let(:tag_helper) { Chef::MachineTag.factory(node) }
+  let(:tag_helper) { Chef::MachineTagRightscale.new }
 
   describe "#create" do
     it "should create a tag" do

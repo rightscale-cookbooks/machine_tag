@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 gem 'berkshelf'
 gem 'thor-foodcritic'
-gem 'thor-scmversion'
 
 group :integration do
   gem 'machine_tag'

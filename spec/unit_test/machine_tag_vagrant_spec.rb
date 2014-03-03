@@ -20,14 +20,6 @@
 require 'spec_helper'
 
 describe Chef::MachineTagVagrant do
-  let(:node) do
-    node = Chef::Node.new
-    node.set['hostname'] = 'some_host'
-    node.set['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/machine_tag_cache/'
-    node.set['cloud']['provider'] = 'vagrant'
-    node
-  end
-
   let(:remote_tags) do
     <<-EOF
       [
@@ -58,7 +50,7 @@ describe Chef::MachineTagVagrant do
     EOF
   end
 
-  let(:tag_helper) { Chef::MachineTag.factory(node) }
+  let(:tag_helper) { Chef::MachineTagVagrant.new('somehost', '/vagrant/machine_tag_cache/') }
 
   describe "public methods" do
     let(:tags_array) { JSON.parse(local_tags) }
@@ -156,7 +148,7 @@ describe Chef::MachineTagVagrant do
       context "cache directory does not exist" do
         it "should create tag cache dir" do
           File.should_receive(:directory?).and_return(false)
-          FileUtils.should_receive(:mkdir_p).with('/vagrant/machine_tag_cache/some_host')
+          FileUtils.should_receive(:mkdir_p).with('/vagrant/machine_tag_cache/somehost')
 
           tag_helper.send(:make_cache_dir)
         end
