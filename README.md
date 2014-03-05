@@ -143,7 +143,7 @@ Returns an array of tag hashes for all servers in your environment that matches 
   <tr>
     <td>query</td>
     <td>the tags to be queried. If this is passed as a String the tags must be space delimited.</td>
-    <td><tt>String, Array</tt></td>
+    <td><tt>String</tt>, <tt>Array</tt></td>
   </tr>
   <tr>
     <td>options</td>
