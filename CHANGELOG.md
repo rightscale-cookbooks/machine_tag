@@ -7,8 +7,8 @@ v1.0.4
 ------
 
 - `Chef::MachineTag.factory` now checks for existence of `rs_tag` utility to detect RightScale environment. ([#10][])
-- Document Ruby 1.9 support. ([#9][])
-- Update `tag_search` documentation in README ([#7][])
+- Document Ruby 1.9 support. ([#7][])
+- Update `tag_search` documentation in README ([#9][])
 
 v1.0.3
 ------
