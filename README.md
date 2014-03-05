@@ -12,6 +12,7 @@ Github Repository: [https://github.com/rightscale-cookbooks/machine_tag](https:/
 # Requirements
 
  * [machine_tag] gem which provides a library for using machine tags.
+ * Requires Ruby 1.9 or higher
  * Platform
    * Ubuntu 12.04
    * Ubuntu 10.04
