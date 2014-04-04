@@ -34,6 +34,8 @@ class Chef
     #
     def create(tag)
       update_tag_file do |tag_array|
+        old_tags = ::MachineTag::Set.new(tag_array)[::MachineTag::Tag.new(tag).namespace_and_predicate]
+        tag_array.delete(old_tags.first) unless old_tags.empty?
         tag_array << tag unless tag_array.include?(tag)
       end
     end
