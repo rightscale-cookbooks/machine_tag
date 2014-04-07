@@ -3,6 +3,12 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v1.0.5
+------
+
+- Update to [test-kitchen](http://rubygems.org/gems/test-kitchen) 1.2.1 and use the new concurrency flag. ([#12][])
+- Make the Vagrant tag support act like RightScale where machine tags are only unique by namespace and predicate. ([#14][])
+
 v1.0.4
 ------
 
@@ -38,3 +44,5 @@ v1.0.0
 [#7]: https://github.com/rightscale-cookbooks/machine_tag/issues/7
 [#9]: https://github.com/rightscale-cookbooks/machine_tag/issues/9
 [#10]: https://github.com/rightscale-cookbooks/machine_tag/issues/10
+[#12]: https://github.com/rightscale-cookbooks/machine_tag/issues/12
+[#14]: https://github.com/rightscale-cookbooks/machine_tag/issues/14
