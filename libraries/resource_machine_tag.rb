@@ -18,6 +18,7 @@
 #
 
 require 'chef/resource'
+require 'machine_tag'
 
 class Chef
   class Resource
@@ -42,7 +43,7 @@ class Chef
           :name,
           arg,
           :kind_of => String,
-          :regex => /^[a-zA-Z]\w*:[a-zA-Z]\w*=(\*|[^*]+)$/
+          :regex => /^#{::MachineTag::NAMESPACE_AND_PREDICATE}=(?<value>\*|[^*]+)$/
         )
       end
 
