@@ -9,5 +9,5 @@ group :integration do
   gem 'kitchen-vagrant'
   gem 'travis-lint'
   gem 'chefspec', '~> 2.0.1'
-  gem 'strainer'
+  gem 'strainer', '~> 3.3.0'
 end

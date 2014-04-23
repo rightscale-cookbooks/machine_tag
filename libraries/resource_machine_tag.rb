@@ -38,11 +38,12 @@ class Chef
       # @return [String] the machine tag name
       #
       def name(arg = nil)
+        require 'machine_tag'
         set_or_return(
           :name,
           arg,
           :kind_of => String,
-          :regex => /^[a-zA-Z]\w*:[a-zA-Z]\w*=(\*|[^*]+)$/
+          :regex => /^#{::MachineTag::NAMESPACE_AND_PREDICATE}=(?<value>\*|[^*]+)$/
         )
       end
 
