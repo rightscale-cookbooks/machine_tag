@@ -18,7 +18,6 @@
 #
 
 require 'chef/resource'
-require 'machine_tag'
 
 class Chef
   class Resource
@@ -39,6 +38,7 @@ class Chef
       # @return [String] the machine tag name
       #
       def name(arg = nil)
+        require 'machine_tag'
         set_or_return(
           :name,
           arg,
