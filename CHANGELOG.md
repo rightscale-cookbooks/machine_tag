@@ -3,6 +3,12 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v1.0.6
+------
+
+- Update tag validation regex. ([#13][])
+- Update strainer gem version to 3.x
+
 v1.0.5
 ------
 
@@ -45,4 +51,5 @@ v1.0.0
 [#9]: https://github.com/rightscale-cookbooks/machine_tag/issues/9
 [#10]: https://github.com/rightscale-cookbooks/machine_tag/issues/10
 [#12]: https://github.com/rightscale-cookbooks/machine_tag/issues/12
+[#13]: https://github.com/rightscale-cookbooks/machine_tag/issues/13
 [#14]: https://github.com/rightscale-cookbooks/machine_tag/issues/14
