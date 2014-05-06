@@ -15,7 +15,7 @@ Github Repository: [https://github.com/rightscale-cookbooks/machine_tag](https:/
  * Requires Ruby 1.9 or higher
  * Platform
    * Ubuntu 12.04
-   * CentOS 6.4
+   * CentOS 6
 
 [machine_tag]: https://rubygems.org/gems/machine_tag
 
