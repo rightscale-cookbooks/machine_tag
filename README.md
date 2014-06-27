@@ -1,6 +1,10 @@
 # machine_tag cookbook
 
-[![Build Status](https://travis-ci.org/rightscale-cookbooks/machine_tag.png?branch=master)](https://travis-ci.org/rightscale-cookbooks/machine_tag)
+[![Cookbook Version](https://img.shields.io/cookbook/v/machine_tag.svg)][cookbook]
+[![Build Status](http://img.shields.io/travis/rightscale-cookbooks/machine_tag.svg)][travis]
+
+[cookbook]: https://community.opscode.com/cookbooks/machine_tag
+[travis]: http://travis-ci.org/rightscale-cookbooks/machine_tag
 
 This cookbook provides a `machine_tag` resource that can create, delete, list, and
 search [machine tags][Tagging] in the Vagrant and RightScale environments. 
