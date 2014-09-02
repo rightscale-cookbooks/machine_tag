@@ -149,15 +149,12 @@ describe Chef::MachineTagBase do
     context 'tag is found in the array of tag sets' do
       it 'should return the array of tag sets containing the tag' do
         output_array = base.send(:detect_tag, tag_set_array, 'rs_login:state=*')
-        #output_array.should have(2).items
         expect(output_array.size).to eq(2)
 
         output_array = base.send(:detect_tag, tag_set_array, 'rs_monitoring:state=active')
-        # output_array.should have(1).items
         expect(output_array.size).to eq(1)
 
         output_array = base.send(:detect_tag, tag_set_array, 'rs_monitoring:state')
-        # output_array.should have(1).items
         expect(output_array.size).to eq(1)
       end
     end
