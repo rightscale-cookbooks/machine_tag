@@ -79,7 +79,18 @@ class Chef
     #
     def run_rs_tag_util(*args)
       cmd = ['rs_tag'] + args
-      shell_out!(cmd).stdout
+
+      # As network issues can cause rs_tag to fail,
+      # we will do retries with a timeout.
+      Timeout.timeout(120) do
+        begin
+          shell_out!(cmd).stdout
+        rescue Exception => msg
+          puts msg
+          sleep 2
+          retry
+        end
+      end
     end
   end
 end
