@@ -3,6 +3,11 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v1.0.8
+------
+
+- Network issues can cause `rs_tag` command to fail. Retries are done if command is initially unsuccessful.
+
 v1.0.7
 ------
 
