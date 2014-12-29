@@ -26,12 +26,12 @@ describe Chef::MachineTagHelper do
     node
   end
 
-  let(:env_stub) { double("Chef::MachineTagBase") }
+  let(:env_stub) { double('Chef::MachineTagBase') }
 
   let(:tag_set) { MachineTag::Set['foo:bar=true', 'namespace:predicate=value'] }
 
-  describe ".tag_search" do
-    it "should search for the given tag(s) and return an array of tag sets" do
+  describe '.tag_search' do
+    it 'should search for the given tag(s) and return an array of tag sets' do
       query_tag = 'namespace:predicate=value'
       query_tags = [query_tag, 'foo:bar=true']
 
@@ -41,24 +41,24 @@ describe Chef::MachineTagHelper do
       tags = Chef::MachineTagHelper.tag_search(node, query_tag)
       tags.should be_instance_of(Array)
       tags.first.should be_instance_of(MachineTag::Set)
-      tags.first.should == tag_set
+      tags.first.should eq(tag_set)
 
       env_stub.should_receive(:search).with(query_tags, {}).and_return([tag_set])
       tags = Chef::MachineTagHelper.tag_search(node, query_tags)
       tags.should be_instance_of(Array)
       tags.first.should be_instance_of(MachineTag::Set)
-      tags.first.should == tag_set
+      tags.first.should eq(tag_set)
 
       options = {
-        :required_tags => ['foo:bar'],
-        :query_timeout => 5
+        required_tags: ['foo:bar'],
+        query_timeout: 5,
       }
 
       env_stub.should_receive(:search).with(query_tag, options).and_return([tag_set])
       tags = Chef::MachineTagHelper.tag_search(node, query_tag, options)
       tags.should be_instance_of(Array)
       tags.first.should be_instance_of(MachineTag::Set)
-      tags.first.should == tag_set
+      tags.first.should eq(tag_set)
 
       env_stub.should_receive(:search).with(query_tags, options).and_return([tag_set])
       tags = Chef::MachineTagHelper.tag_search(node, query_tags, options)
@@ -68,8 +68,8 @@ describe Chef::MachineTagHelper do
     end
   end
 
-  describe ".tag_list" do
-    it "should list the tags on the server" do
+  describe '.tag_list' do
+    it 'should list the tags on the server' do
       Chef::MachineTag.should_receive(:factory).with(node).and_return(env_stub)
       env_stub.should_receive(:list).and_return(tag_set)
 
