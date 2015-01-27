@@ -84,7 +84,7 @@ class Chef
       # we will do retries with a timeout.
       Timeout.timeout(120) do
         begin
-          shell_out!(cmd).run_command
+          shell_out!(cmd).run_command.stdout
         rescue Mixlib::ShellOut::ShellCommandFailed => err_msg
           puts "#{err_msg}\nretrying"
           sleep 2

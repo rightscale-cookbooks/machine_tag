@@ -3,6 +3,11 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v1.0.9
+------
+
+- Fixed bug in run_rs_tag_util method not returning string output.
+
 v1.0.8
 ------
 
