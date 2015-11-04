@@ -46,6 +46,9 @@ class Chef
       if shell_out('which', 'rs_tag').exitstatus == 0
         # This is a RightScale environment
         Chef::MachineTagRightscale.new
+      elsif shell_out('which', 'rsc').exitstatus == 0
+        # This is a RightLink 10 environment
+        Chef::MachineTagRl10.new
       elsif node['cloud'] && node['cloud']['provider'] == 'vagrant'
         # This is a Vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
