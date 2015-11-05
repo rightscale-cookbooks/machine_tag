@@ -28,8 +28,12 @@ class Chef
 
     include Chef::Mixin::ShellOut
 
-    def initialize
-      @client =  RightApi::Client.new(:rl10 => true) unless @client
+    def initialize_api_client
+      RightApi::Client.new(:rl10 => true)
+    end
+    
+    def api_client
+      @@api_client ||= initialize_api_client
     end
     
     # Creates a tag on the server.
@@ -37,7 +41,11 @@ class Chef
     # @param tag [String] the tag to be created
     #
     def create(tag)
-      @client.tags.multi_add(resource_href: @client.index_instance_session.href, tags: [tag]) unless @client
+      begin
+        api_client.tags.multi_add(resource_href: api_client.index_instance_session.href, tags: [tag])
+      rescue RightApi::ApiError => e
+        puts e
+      end
     end
 
     # Deletes a tag from the server.
@@ -45,7 +53,7 @@ class Chef
     # @param tag [String] the tag to be deleted
     #
     def delete(tag)
-      @client.tags.multi_delete(resource_href: @client.index_instance_session.href, tags: [tag]) 
+      api_client.tags.multi_delete(resource_href: api_client.index_instance_session.href, tags: [tag]) 
     end
 
     # Lists all tags on the server.
@@ -53,9 +61,8 @@ class Chef
     # @return [MachineTag::Set] the tags on the server
     #
     def list
-      json = @client.tags.by_resource(resource_href: @client.index_instance_session.href)
-      puts "list #{json}"
-      ::MachineTag::Set.new(JSON.parse(json)))
+      json = api_client.tags.by_resource(resource_href: api_client.index_instance_session.href)
+      ::MachineTag::Set.new(JSON.parse(json))
     end
 
 
@@ -68,9 +75,8 @@ class Chef
     # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
     def do_query(query_tags)
-      json = @client.tags.by_tag(resource_type: 'servers', tags: [query_tags] )
+      json = api_client.tags.by_tag(resource_type: 'servers', tags: [query_tags] )
       tags_hash = JSON.parse(json)
-      puts "tags_hash #{tags_hash}"
       tags_set_array = []
       tags_hash.values.each do |value|
         tags_set_array << ::MachineTag::Set.new(value['tags'])

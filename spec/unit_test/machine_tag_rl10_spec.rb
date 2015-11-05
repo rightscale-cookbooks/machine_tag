@@ -67,58 +67,63 @@ describe Chef::MachineTagRl10 do
     EOF
   end
   
+  let(:provider) do
+    provider = Chef::MachineTagRl10.new
+    provider.stub(:initialize_api_client).and_return(client_stub)
+    provider
+  end
+  
   let(:client_stub) do
     client = double('RightApi::Client', :log => nil)
     client.stub(:get_instance).and_return(instance_stub)
-    client.stub(:tags)
-    client.tags.stub(
-      :by_tag => {},
-      :by_resource => {},
-      :multi_add=> nil,
-      :multi_delete => nil
-    )
+    client.stub_chain(:index_instance_session,:href).and_return("/foo")
+    client.stub_chain(:tags, :multi_add)
+    client.stub_chain(:tags, :multi_delete)
+    client.stub_chain(:tags, :by_resource)
+    client.stub_chain(:tags, :by_tag).and_return(rs_raw_output)
+    client
   end
 
-    let(:tag) do
-    tag = double('tags')
-    tag.stub(
-      :by_tag => {},
-      :by_resource => {},
-      :multi_add=> nil,
-      :multi_delete => nil
-    )
-    tag
-  end
-  
-  let(:tag_helper) { Chef::MachineTagRl10.new }
+  let(:instance_stub) { double('instance', :links => [], :href => 'some_href') }
 
   describe "#create" do
     it "should create a tag" do
-      tags = client_stub.tags
-      tags.should_receive(:by_tag)
-      tag_helper.create('some:tag=true')
+      client_stub.tags.should_receive(:multi_add).
+        with(hash_including(resource_href: '/foo',tags:['some:tag=true']))
+      provider.create('some:tag=true')
+    end
+    
+    it "should create a tag" do
+      client_stub.tags.should_receive(:multi_add).
+        with(hash_including(resource_href: '/foo',tags:['some:tag=true'])) { raise "some error"  }
+      expect{provider.create('some:tag=true')}.to raise_error
     end
   end
 
   describe "#delete" do
     it "should delete a tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--remove', 'some:tag=true')
-      tag_helper.delete('some:tag=true')
+      client_stub.tags.should_receive(:multi_delete).
+        with(hash_including(resource_href: '/foo',tags:['some:tag=true']))
+      provider.delete('some:tag=true')
     end
   end
 
   describe "#list" do
     it "should list the tags in the server" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--list').and_return(rs_list_result)
-      tag_helper.list
+      client_stub.tags.should_receive(:by_resource).
+        with(hash_including(resource_href: '/foo')).
+        and_return(rs_list_result)
+      provider.list
     end
   end
 
   describe "#do_query" do
     it "should return an array of tag sets containing the query tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--query', 'database:active=true').and_return(rs_raw_output)
+      client_stub.tags.should_receive(:by_tag).
+        with(hash_including(resource_type: 'servers', tags: ['database:active=true'])).
+        and_return(rs_raw_output)
 
-      tags = tag_helper.send(:do_query, ['database:active=true'])
+      tags = provider.send(:do_query,'database:active=true')
       tags.should be_a(Array)
       tags.first.should be_a(MachineTag::Set)
 

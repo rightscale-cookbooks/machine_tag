@@ -18,6 +18,7 @@
 #
 
 require_relative 'machine_tag_rightscale'
+require_relative 'machine_tag_rl10'
 require_relative 'machine_tag_vagrant'
 
 require 'chef/mixin/shell_out'
@@ -46,7 +47,7 @@ class Chef
       if shell_out('which', 'rs_tag').exitstatus == 0
         # This is a RightScale environment
         Chef::MachineTagRightscale.new
-      elsif shell_out('which', 'rsc').exitstatus == 0
+      elsif shell_out('which', 'rightlink') == 10
         # This is a RightLink 10 environment
         Chef::MachineTagRl10.new
       elsif node['cloud'] && node['cloud']['provider'] == 'vagrant'
