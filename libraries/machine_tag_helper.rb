@@ -47,7 +47,7 @@ class Chef
       if shell_out('which', 'rs_tag').exitstatus == 0
         # This is a RightScale environment
         Chef::MachineTagRightscale.new
-      elsif shell_out('rightlink', '-version') =~ /^Rightlink 10./
+      elsif shell_out('rightlink', '-version') =~ /^Rightlink 10/
         # This is a RightLink 10 environment
         Chef::MachineTagRl10.new
       elsif node['cloud'] && node['cloud']['provider'] == 'vagrant'
