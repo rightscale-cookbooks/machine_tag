@@ -66,12 +66,36 @@ describe Chef::MachineTagRl10 do
       ]
     EOF
   end
+  
+  let(:client_stub) do
+    client = double('RightApi::Client', :log => nil)
+    client.stub(:get_instance).and_return(instance_stub)
+    client.stub(:tags)
+    client.tags.stub(
+      :by_tag => {},
+      :by_resource => {},
+      :multi_add=> nil,
+      :multi_delete => nil
+    )
+  end
 
+    let(:tag) do
+    tag = double('tags')
+    tag.stub(
+      :by_tag => {},
+      :by_resource => {},
+      :multi_add=> nil,
+      :multi_delete => nil
+    )
+    tag
+  end
+  
   let(:tag_helper) { Chef::MachineTagRl10.new }
 
   describe "#create" do
     it "should create a tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--add', 'some:tag=true')
+      tags = client_stub.tags
+      tags.should_receive(:by_tag)
       tag_helper.create('some:tag=true')
     end
   end
