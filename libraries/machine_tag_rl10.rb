@@ -20,7 +20,6 @@
 require_relative 'machine_tag_base'
 
 require 'json'
-require 'right_api_client'
 require 'chef/mixin/shell_out'
 
 class Chef
@@ -29,6 +28,7 @@ class Chef
     include Chef::Mixin::ShellOut
 
     def initialize_api_client
+      require "right_api_client"
       RightApi::Client.new(:rl10 => true)
     end
     
