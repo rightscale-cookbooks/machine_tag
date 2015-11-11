@@ -41,11 +41,7 @@ class Chef
     # @param tag [String] the tag to be created
     #
     def create(tag)
-      begin
-        api_client.tags.multi_add(resource_href: api_client.index_instance_session.href, tags: [tag])
-      rescue RightApi::ApiError => e
-        puts e
-      end
+      api_client.tags.multi_add(resource_hrefs: [api_client.get_instance.href], tags: [tag])
     end
 
     # Deletes a tag from the server.
@@ -53,7 +49,7 @@ class Chef
     # @param tag [String] the tag to be deleted
     #
     def delete(tag)
-      api_client.tags.multi_delete(resource_href: api_client.index_instance_session.href, tags: [tag]) 
+      api_client.tags.multi_delete(resource_hrefs: [api_client.get_instance.href], tags: [tag]) 
     end
 
     # Lists all tags on the server.
@@ -61,8 +57,9 @@ class Chef
     # @return [MachineTag::Set] the tags on the server
     #
     def list
-      json = api_client.tags.by_resource(resource_href: api_client.index_instance_session.href)
-      ::MachineTag::Set.new(JSON.parse(json))
+      tags = api_client.tags.by_resource(resource_hrefs: 
+          [api_client.get_instance.href]).first.tags
+      ::MachineTag::Set.new(tags.map{|tag| tag["name"]})
     end
 
 
@@ -75,8 +72,16 @@ class Chef
     # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
     def do_query(query_tags)
-      json = api_client.tags.by_tag(resource_type: 'servers', tags: [query_tags] )
-      tags_hash = JSON.parse(json)
+      links = api_client.tags.by_tag(resource_type: 'instances', tags: [query_tags] ).
+        first.links
+      tags_hash = {}
+      if links
+        links.each {|link| tags_hash[link["href"]]={
+            "tags"=> api_client.tags.by_resource(resource_hrefs: 
+                [link["href"]]).first.tags.map{|tag| tag["name"]}
+          }
+        }
+      end
       tags_set_array = []
       tags_hash.values.each do |value|
         tags_set_array << ::MachineTag::Set.new(value['tags'])
