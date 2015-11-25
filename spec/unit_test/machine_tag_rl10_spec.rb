@@ -73,19 +73,22 @@ describe Chef::MachineTagRl10 do
     provider
   end
   
-  let!(:client_stub) do
+  let(:client_stub) do
     client = double('RightApi::Client', :log => nil)
     client.stub(:get_instance).and_return(instance_stub)
-    client.stub_chain(:get_instance,:href).and_return("/foo")
-    client.stub_chain(:tags, :multi_add)
-    client.stub_chain(:tags, :multi_delete)
-    client.stub_chain(:tags, :by_resource)
-    client.stub_chain(:tags, :by_tag).and_return(rs_raw_output)
     client
   end
-
+  
   let!(:instance_stub) { double('instance', :links => [], :href => 'some_href') }
 
+  before(:each) do
+    client = client_stub
+    client.stub_chain(:get_instance,:href).and_return("/foo")
+    client.stub_chain(:get_instance,:tags)
+    client.stub_chain(:tags, :multi_add)
+    client.stub_chain(:tags,:multi_delete)
+  end
+  
   describe "#create" do
     it "should create a tag" do
       client_stub.tags.should_receive(:multi_add).
@@ -144,6 +147,19 @@ describe Chef::MachineTagRl10 do
           "terminator:discovery_time=Tue Jun 04 22:07:07 +0000 2013"
         ]
       ]
+
+      tags.should == expected_output
+    end
+    
+    it "should return an empty array" do
+      client_stub.tags.should_receive(:by_tag).
+        with(hash_including(resource_type: 'instances', tags: ["something"])).
+        and_return([])
+
+      tags = provider.send(:do_query,'something')
+      tags.should be_a(Array)
+
+      expected_output = []
 
       tags.should == expected_output
     end
