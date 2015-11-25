@@ -72,15 +72,18 @@ class Chef
     # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
     def do_query(query_tags)
-      links = api_client.tags.by_tag(resource_type: 'instances', tags: [query_tags] ).
-        first.links
+      resources = api_client.tags.by_tag(resource_type: 'instances', tags: [query_tags] )
+      
       tags_hash = {}
-      if links
-        links.each {|link| tags_hash[link["href"]]={
-            "tags"=> api_client.tags.by_resource(resource_hrefs: 
-                [link["href"]]).first.tags.map{|tag| tag["name"]}
+      if resources.first
+        links = resources.first.links
+        if links
+          links.each {|link| tags_hash[link["href"]]={
+              "tags"=> api_client.tags.by_resource(resource_hrefs: 
+                  [link["href"]]).first.tags.map{|tag| tag["name"]}
+            }
           }
-        }
+        end
       end
       tags_set_array = []
       tags_hash.values.each do |value|
