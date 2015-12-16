@@ -33,7 +33,7 @@ class Chef
     end
     
     def api_client
-      @@api_client ||= initialize_api_client
+      @api_client = initialize_api_client
     end
     
     # Creates a tag on the server.
@@ -78,9 +78,10 @@ class Chef
       if resources.first
         links = resources.first.links
         if links
-          links.each {|link| tags_hash[link["href"]]={
-              "tags"=> api_client.tags.by_resource(resource_hrefs: 
-                  [link["href"]]).first.tags.map{|tag| tag["name"]}
+          links.each {|link| 
+            resource_tags = api_client.tags.by_resource(resource_hrefs:[link["href"]])#.first.tags
+            tags_hash[link["href"]]={
+              "tags"=> resource_tags.first.tags.map{|tag| tag["name"]}
             }
           }
         end
