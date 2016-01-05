@@ -6,6 +6,7 @@ description      'Installs/Configures machine_tag'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '1.1.0'
 
+depends 'apt', '~> 2.9.2'
 depends 'build-essential'
 
 recipe 'machine_tag::default', "Installs the 'machine_tag' gem used by the helpers."
