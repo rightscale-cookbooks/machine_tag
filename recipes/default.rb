@@ -18,5 +18,7 @@
 #
 
 log "Installing 'machine_tag' gem"
+include_recipe 'build-essential'
 
 chef_gem 'machine_tag'
+chef_gem 'right_api_client'
