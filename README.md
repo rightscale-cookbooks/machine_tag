@@ -19,6 +19,7 @@ Github Repository: [https://github.com/rightscale-cookbooks/machine_tag](https:/
 
  * [machine_tag] gem which provides a library for using machine tags.
  * Requires Ruby 1.9 or higher
+ * Requires [RightLink 10](http://docs.rightscale.com/rl10/) See cookbook version 1.0.9 for RightLink 6 support
  * Platform
    * Ubuntu 12.04
    * CentOS 6
