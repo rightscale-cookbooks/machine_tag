@@ -73,7 +73,8 @@ class Chef
     #
     def do_query(query_tags, options = {})
       query_tags = [query_tags] if query_tags.kind_of?(String)
-      resources = api_client.tags.by_tag(resource_type: 'instances', tags: query_tags, options)
+      match_all = options[:match_all] ? false
+      resources = api_client.tags.by_tag(resource_type: 'instances', tags: query_tags, match_all: match_all)
       
       tags_hash = {}
       if resources.first
