@@ -72,7 +72,8 @@ class Chef
     # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
     def do_query(query_tags)
-      resources = api_client.tags.by_tag(resource_type: 'instances', tags: query_tags.split(' ') )
+      query_tags = [query_tags] if query_tags.kind_of?(String)
+      resources = api_client.tags.by_tag(resource_type: 'instances', tags: query_tags )
       
       tags_hash = {}
       if resources.first
