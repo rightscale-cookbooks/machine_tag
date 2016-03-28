@@ -80,6 +80,7 @@ class Chef
         links = resources.first.links
         if links
           links.each do |link|
+            Chef::Log.info "Tagged Resource State:#{api_client.resource(link["href"]).state}"
             if api_client.resource(link["href"]).state == 'operational'
               resource_tags = api_client.tags.by_resource(resource_hrefs:[link["href"]])#.first.tags
               tags_hash[link["href"]]={
