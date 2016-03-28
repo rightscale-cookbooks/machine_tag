@@ -67,7 +67,7 @@ class Chef
     #
     def search(query_tags, options = {})
       query_tags = [query_tags] if query_tags.kind_of?(String)
-      tags_set_array = do_query(query_tags)
+      tags_set_array = do_query(query_tags,options)
 
       unless options[:required_tags].nil? || options[:required_tags].empty?
         # Set timeout for querying for required_tags. By default, the timeout is set
@@ -86,7 +86,7 @@ class Chef
                 Kernel.sleep(sleep_sec)
 
                 Chef::Log.info "Re-querying for '#{tag}'..."
-                tags_set_array = do_query(query_tags)
+                tags_set_array = do_query(query_tags,options)
               end
             end
           end
@@ -107,7 +107,7 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the list of all tags on the servers that match the query
     #
-    def do_query(query_tags)
+    def do_query(query_tags,options = {})
       not_implemented
     end
 
