@@ -73,8 +73,10 @@ class Chef
     #
     def do_query(query_tags)
       query_tags = [query_tags] if query_tags.kind_of?(String)
+      Chef::Log.info "Tagged query_tags: #{query_tags}"
       resources = api_client.tags.by_tag(resource_type: 'instances', tags: query_tags)
-      
+      Chef::Log.info "Tagged resources: #{resources}"
+
       tags_hash = {}
       if resources.first
         links = resources.first.links
