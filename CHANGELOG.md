@@ -3,6 +3,16 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v1.1.1
+------
+
+- Added support for match_all and defaulting to false
+
+v1.1.0
+------
+
+- Added support for RightLink 10
+
 v1.0.9
 ------
 
