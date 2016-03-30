@@ -71,19 +71,26 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
-    def do_query(query_tags)
-      resources = api_client.tags.by_tag(resource_type: 'instances', tags: [query_tags] )
-      
+    def do_query(query_tags, options = {})
+      query_tags = [query_tags] if query_tags.kind_of?(String)
+      Chef::Log.info "Tagged query_tags: #{query_tags}"
+      match_all = options.fetch(:match_all, false)
+      resources = api_client.tags.by_tag(resource_type: 'instances', tags: query_tags, match_all: match_all)
+      Chef::Log.info "Tagged resources: #{resources}"
+
       tags_hash = {}
       if resources.first
         links = resources.first.links
         if links
-          links.each {|link| 
-            resource_tags = api_client.tags.by_resource(resource_hrefs:[link["href"]])#.first.tags
-            tags_hash[link["href"]]={
-              "tags"=> resource_tags.first.tags.map{|tag| tag["name"]}
-            }
-          }
+          links.each do |link|
+            Chef::Log.info "Tagged Resource State:#{api_client.resource(link["href"]).state}"
+            if api_client.resource(link["href"]).state == 'operational'
+              resource_tags = api_client.tags.by_resource(resource_hrefs:[link["href"]])#.first.tags
+              tags_hash[link["href"]]={
+                "tags"=> resource_tags.first.tags.map{|tag| tag["name"]}
+              }
+            end
+          end
         end
       end
       tags_set_array = []
