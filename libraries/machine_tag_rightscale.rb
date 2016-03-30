@@ -60,7 +60,7 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
-    def do_query(query_tags)
+    def do_query(query_tags, options = {})
       tags_hash = JSON.parse(run_rs_tag_util("--query", query_tags.join(' ')))
       tags_set_array = []
       tags_hash.values.each do |value|

@@ -66,7 +66,7 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the tags on the VMs that match the query
     #
-    def do_query(query_tags)
+    def do_query(query_tags, options = {})
       query_result = []
 
       # Return empty array if no tags are found in the query string
