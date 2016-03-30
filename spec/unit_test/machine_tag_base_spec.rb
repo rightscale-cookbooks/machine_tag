@@ -44,14 +44,14 @@ describe Chef::MachineTagBase do
 
     context 'when no query options are specified' do
       it 'should do a query and return the tags matching the query' do
-        base.should_receive(:do_query).with(['database:active=true']).and_return([tag_set])
+        base.should_receive(:do_query).with(['database:active=true'],{}).and_return([tag_set])
 
         search_output = base.search('database:active=true')
         search_output.should == [tag_set]
 
         base.should_receive(:do_query).with([
           'database:active=true', 'rs_monitoring:state=active'
-        ]).and_return([tag_set])
+        ],{}).and_return([tag_set])
 
         search_output = base.search(['database:active=true', 'rs_monitoring:state=active'])
         search_output.should == [tag_set]
@@ -65,7 +65,7 @@ describe Chef::MachineTagBase do
           # initially, but appears in the query sometime later
           tag_set_partial = tag_set.union(['database:master=true'])
           tag_set_full = tag_set_partial.union(['database:repl=active'])
-          base.should_receive(:do_query).with(['database:active=true']).exactly(4).and_return(
+          base.should_receive(:do_query).with(['database:active=true'],{:required_tags=>["database:master=true", "database:repl=active"]}).exactly(4).and_return(
             [tag_set],
             [tag_set_partial],
             [tag_set_partial],
@@ -84,12 +84,12 @@ describe Chef::MachineTagBase do
         it 'should raise a Timeout exception' do
           query_tag = 'database:active=true'
 
-          base.should_receive(:do_query).with([query_tag]).at_least(:once).and_return([tag_set])
-
           query_options = {
             required_tags: ['database:master=true'],
             query_timeout: 1,
           }
+
+          base.should_receive(:do_query).with([query_tag],query_options).at_least(:once).and_return([tag_set])
 
           expect do
             base.search('database:active=true', query_options)

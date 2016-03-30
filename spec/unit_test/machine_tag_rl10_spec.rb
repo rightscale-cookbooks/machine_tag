@@ -121,15 +121,15 @@ describe Chef::MachineTagRl10 do
   describe "#do_query" do
     it "should return an array of tag sets containing the query tag" do
       client_stub.tags.should_receive(:by_tag).
-        with(hash_including(resource_type: 'instances', tags: ['database:active=true'])).
+        with(hash_including(resource_type: 'instances', tags: ['database:active=true'], match_all: false)).
         and_return([resources_stub])
-      
+
       client_stub.tags.should_receive(:by_resource).
         with(hash_including(resource_hrefs: ["/some_href"])).
         and_return([resource_tags_stub])
 
       
-      tags = provider.send(:do_query,'database:active=true')
+      tags = provider.send(:do_query,'database:active=true',{ match_all: false })
       tags.should be_a(Array)
       tags.first.should be_a(MachineTag::Set)
 
@@ -164,7 +164,7 @@ describe Chef::MachineTagRl10 do
         with(hash_including(resource_type: 'instances', tags: ["something"])).
         and_return([])
 
-      tags = provider.send(:do_query,'something')
+      tags = provider.send(:do_query,'something',{ match_all: false })
       tags.should be_a(Array)
 
       expected_output = []
