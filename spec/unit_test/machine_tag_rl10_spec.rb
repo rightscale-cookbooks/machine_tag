@@ -71,6 +71,7 @@ describe Chef::MachineTagRl10 do
   let(:client_stub) do
     client = double('RightApi::Client', :log => nil)
     client.stub(:get_instance).and_return(instance_stub)
+    client.stub_chain(:resource,:state).and_return('operational')
     client
   end
   
@@ -82,6 +83,7 @@ describe Chef::MachineTagRl10 do
     double('resources',
       :links=>[{"href"=>"/some_href"}], 
     )}
+
   let(:resource_tags_stub) { double('tag_resources', :tags=> rs_raw_output) }
   
   before(:each) do
