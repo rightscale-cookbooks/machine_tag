@@ -3,7 +3,7 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
-v1.1.1
+v1.2.0
 ------
 
 - Added support for match_all and defaulting to false
