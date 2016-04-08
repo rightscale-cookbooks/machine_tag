@@ -72,6 +72,8 @@ describe Chef::MachineTagRl10 do
     client = double('RightApi::Client', :log => nil)
     client.stub(:get_instance).and_return(instance_stub)
     client.stub_chain(:resource,:state).and_return('operational')
+    client.stub_chain(:get_instance,:show,:cloud,:href).and_return('/api/clouds/6')
+    client.stub_chain(:resource,:show,:cloud,:href).and_return('/api/clouds/6')
     client
   end
   
