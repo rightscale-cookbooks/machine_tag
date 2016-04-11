@@ -82,7 +82,7 @@ describe Chef::MachineTagRl10 do
     
   let(:resources_stub) { 
     double('resources',
-      :links=>[{"href"=>"/some_href"}], 
+      :links=>[{"href"=>"/api/clouds/6/instances/1234"}],
     )}
 
   let(:resource_tags_stub) { double('tag_resources', :tags=> rs_raw_output) }
@@ -128,10 +128,9 @@ describe Chef::MachineTagRl10 do
         and_return([resources_stub])
 
       client_stub.tags.should_receive(:by_resource).
-        with(hash_including(resource_hrefs: ["/some_href"])).
+        with(hash_including(resource_hrefs: ["/api/clouds/6/instances/1234"])).
         and_return([resource_tags_stub])
 
-      
       tags = provider.send(:do_query,'database:active=true',{ match_all: false })
       tags.should be_a(Array)
       tags.first.should be_a(MachineTag::Set)
