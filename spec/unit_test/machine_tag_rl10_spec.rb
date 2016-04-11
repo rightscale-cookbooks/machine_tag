@@ -173,15 +173,5 @@ describe Chef::MachineTagRl10 do
 
       tags.should == expected_output
     end
-
-    it "should raise error because of different cloud" do
-      client_stub.tags.should_receive(:by_tag).
-        with(hash_including(resource_type: 'instances', tags: ['database:active=true'], match_all: false)).
-        and_return([resources_stub])
-
-      client_stub.tags.should_receive(:by_resource).
-        with(hash_including(resource_hrefs: ["/api/clouds/1/instances/1234"])).
-        and_raise
-    end
   end
 end
