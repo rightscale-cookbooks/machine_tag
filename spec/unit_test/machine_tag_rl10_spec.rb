@@ -183,9 +183,8 @@ describe Chef::MachineTagRl10 do
         with(hash_including(resource_type: 'instances', tags: ['database:active=true'], match_all: false)).
         and_return([resources_stub_fail])
 
-      client_stub.tags.should_receive(:by_resource).
-        with(hash_including(resource_hrefs: ["/api/clouds/6/instances/1234"])).
-         and_return([resource_tags_stub])
+      client_stub.tags.should_not_receive(:by_resource).
+        with(hash_including(resource_hrefs: ["/api/clouds/6/instances/1234"]))
 
       tags = provider.send(:do_query,'database:active=true',{ match_all: false })
       tags.should be_a(Array)
