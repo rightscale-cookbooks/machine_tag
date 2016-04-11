@@ -85,6 +85,11 @@ describe Chef::MachineTagRl10 do
       :links=>[{"href"=>"/api/clouds/6/instances/1234"}],
     )}
 
+  let(:resource_stub_fail) {
+    double('resources',
+      :links=>[{"href"=>"/api/clouds/1/instances/1234"}],
+    )}
+
   let(:resource_tags_stub) { double('tag_resources', :tags=> rs_raw_output) }
   
   before(:each) do
@@ -176,11 +181,16 @@ describe Chef::MachineTagRl10 do
     it "should raise error because of different cloud" do
       client_stub.tags.should_receive(:by_tag).
         with(hash_including(resource_type: 'instances', tags: ['database:active=true'], match_all: false)).
-        and_return([resources_stub])
+        and_return([resources_stub_fail])
 
       client_stub.tags.should_receive(:by_resource).
-        with(hash_including(resource_hrefs: ["/api/clouds/1/instances/1234"])).
+        with(hash_including(resource_hrefs: ["/api/clouds/6/instances/1234"])).
         and_raise
+
+      tags = provider.send(:do_query,'database:active=true',{ match_all: false })
+      tags.should be_a(Array)
+      tags.first.should be_a(MachineTag::Set)
+
     end
   end
 end
