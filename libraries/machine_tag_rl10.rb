@@ -83,12 +83,14 @@ class Chef
         links = resources.first.links
         if links
           links.each do |link|
-            Chef::Log.info "Tagged Resource State:#{api_client.resource(link["href"]).state}"
-            if api_client.resource(link["href"]).state == 'operational'
-              resource_tags = api_client.tags.by_resource(resource_hrefs:[link["href"]])#.first.tags
-              tags_hash[link["href"]]={
-                "tags"=> resource_tags.first.tags.map{|tag| tag["name"]}
-              }
+            Chef::Log.info "Tagged Resource Cloud:#{link["href"].split('/')[0..3].join('/')}"
+            if api_client.get_instance.show.cloud.href == link["href"].split('/')[0..3].join('/')
+              if api_client.resource(link["href"]).state == 'operational'
+                resource_tags = api_client.tags.by_resource(resource_hrefs:[link["href"]])#.first.tags
+                tags_hash[link["href"]]={
+                  "tags"=> resource_tags.first.tags.map{|tag| tag["name"]}
+                }
+              end
             end
           end
         end

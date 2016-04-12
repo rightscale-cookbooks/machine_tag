@@ -3,6 +3,11 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v1.2.1
+------
+- Only returns operational instances
+- Only returns instances in the same cloud as the machine executing the call.
+
 v1.2.0
 ------
 

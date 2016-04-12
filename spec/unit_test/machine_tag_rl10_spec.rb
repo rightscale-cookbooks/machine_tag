@@ -72,6 +72,7 @@ describe Chef::MachineTagRl10 do
     client = double('RightApi::Client', :log => nil)
     client.stub(:get_instance).and_return(instance_stub)
     client.stub_chain(:resource,:state).and_return('operational')
+    client.stub_chain(:get_instance,:show,:cloud,:href).and_return('/api/clouds/6')
     client
   end
   
@@ -81,7 +82,12 @@ describe Chef::MachineTagRl10 do
     
   let(:resources_stub) { 
     double('resources',
-      :links=>[{"href"=>"/some_href"}], 
+      :links=>[{"href"=>"/api/clouds/6/instances/1234"}],
+    )}
+
+  let(:resources_stub_fail) {
+    double('resources',
+      :links=>[{"href"=>"/api/clouds/1/instances/1234"}],
     )}
 
   let(:resource_tags_stub) { double('tag_resources', :tags=> rs_raw_output) }
@@ -127,10 +133,9 @@ describe Chef::MachineTagRl10 do
         and_return([resources_stub])
 
       client_stub.tags.should_receive(:by_resource).
-        with(hash_including(resource_hrefs: ["/some_href"])).
+        with(hash_including(resource_hrefs: ["/api/clouds/6/instances/1234"])).
         and_return([resource_tags_stub])
 
-      
       tags = provider.send(:do_query,'database:active=true',{ match_all: false })
       tags.should be_a(Array)
       tags.first.should be_a(MachineTag::Set)
@@ -172,6 +177,19 @@ describe Chef::MachineTagRl10 do
       expected_output = []
 
       tags.should == expected_output
+    end
+    it "should raise error because of different cloud" do
+      client_stub.tags.should_receive(:by_tag).
+        with(hash_including(resource_type: 'instances', tags: ['database:active=true'], match_all: false)).
+        and_return([resources_stub_fail])
+
+      client_stub.tags.should_not_receive(:by_resource).
+        with(hash_including(resource_hrefs: ["/api/clouds/6/instances/1234"]))
+
+      tags = provider.send(:do_query,'database:active=true',{ match_all: false })
+      tags.should be_a(Array)
+      tags.should == []
+
     end
   end
 end

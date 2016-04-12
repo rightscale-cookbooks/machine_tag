@@ -59,12 +59,17 @@ master.vm.host_name = "master"
 See `Vagrantfile` for an example.
 
 ## RightScale Environment
-
+### RightLink 6
 For using this resource in a *RightScale Environment*, the system must be a
 RightScale managed VM to have the required access to the [rs_tag utility][rs_tag].
 
 [rs_tag]: http://support.rightscale.com/12-Guides/RightLink/01-RightLink_Overview/RightLink_Command_Line_Utilities#rs_tag
 
+### RightLink 10
+For using this resource in a *RightScale Environment*, the system must be a
+RightScale managed VM to have the required access to the right_api_client
+with proxy_mode for instance_tokens, the scope is now limited to
+operational instances in the same cloud as the VM making the call. 
 
 # Usage
 
