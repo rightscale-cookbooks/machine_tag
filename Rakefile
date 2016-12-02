@@ -14,21 +14,21 @@ task :setup_test_environment do
       cookbook_path            ['.', 'berks-cookbooks/' ]
     EOF
   end
-  exit(system('berks vendor'))
+  sh "berks vendor"
 end
 
 desc "runs knife cookbook test"
 task :knife => [ :setup_test_environment ] do
   cmd = "bundle exec knife cookbook test #{cookbook} -c knife.rb"
   puts cmd
-  exit(system(cmd))
+  sh(cmd)
 end
 
 desc "runs foodcritic"
 task :foodcritic do
   cmd = "bundle exec foodcritic --epic-fail any --tags ~FC009 --tags ~FC064 --tags ~FC065 #{directory}"
   puts cmd
-  exit(system(cmd))
+  sh(cmd)
 end
 
 desc "runs foodcritic linttask"
@@ -44,14 +44,14 @@ desc "runs rspec"
 task :rspec do
   cmd = "bundle exec rspec --color --format documentation"
   puts cmd
-  exit(system(cmd))
+  sh cmd
 end
 
 desc "runs testkitchen"
 task :kitchen do
   cmd = "chef exec kitchen test --concurrency=2"
   puts cmd
-  exit(system(cmd))
+  sh(cmd)
 end
 
 desc "runs all tests except kitchen"
