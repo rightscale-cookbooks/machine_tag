@@ -21,7 +21,5 @@ log "Installing 'machine_tag' gem"
 include_recipe 'build-essential'
 
 chef_gem 'machine_tag'
-# pin gem for ruby 1.9/chef 11 compatiblity
-chef_gem 'right_api_client' do
-  version "1.6.1"
-end
+
+chef_gem 'right_api_client'
