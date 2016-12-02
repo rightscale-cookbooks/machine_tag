@@ -31,8 +31,8 @@ describe Chef::Provider::MachineTag do
   let(:run_context) { Chef::RunContext.new(node, {}, events) }
   let(:node) do
     node = Chef::Node.new
-    node.set['hostname'] = 'some_host'
-    node.set['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/machine_tag_cache/'
+    node.default['hostname'] = 'some_host'
+    node.default['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/machine_tag_cache/'
     node
   end
   let(:tag) { 'namespace:predicate=value' }

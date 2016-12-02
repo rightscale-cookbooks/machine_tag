@@ -58,11 +58,11 @@ describe Chef::Resource::MachineTag do
         'name space:predicate=value',        # don't allow space in namespace
         'namespace:pred icate=value',        # don't allow space in predicate
         'namespace::predicate=value',        # don't allow double '::'
-        'name!space:predicate=value',        # don't allow '!' chars in namespace 
+        'name!space:predicate=value',        # don't allow '!' chars in namespace
         ':namespace:predicate=value',        # don't start with a ':'
         'namespace=predicate:value',         # can't be missing ':' before '='
         'name:space:predicate=value',        # can't have more than 1 ':' before '='
-        'namespace:predicate'                # can't have missing '=' 
+        'namespace:predicate'                # can't have missing '='
       ]
       invalid_tags.each do |tag|
         expect do
