@@ -14,7 +14,7 @@ task :setup_test_environment do
       cookbook_path            ['.', 'berks-cookbooks/' ]
     EOF
   end
-  exit(system(cmd))
+  exit(system('berks vendor'))
 end
 
 desc "runs knife cookbook test"
