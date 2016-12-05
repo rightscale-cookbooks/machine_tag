@@ -17,3 +17,7 @@ VERSION
 cache_dir/machine_tag_cache
 .yardoc/
 doc/
+
+berks-cookbooks/
+knife.rb
+syntaxcache/
