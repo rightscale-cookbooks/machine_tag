@@ -98,11 +98,11 @@ task :kitchen do
 end
 
 desc "runs all tests except kitchen"
-task :except_kitchen => [  :knife, :foodcritic, :rspec ] do
+task :except_kitchen => [ :verify_version, :knife, :foodcritic, :rspec ] do
   puts "running all tests except kitchen"
 end
 
 desc "runs all tests"
-task :default => [ :verify_version, :except_kitchen, :kitchen ] do
+task :default => [  :except_kitchen, :kitchen ] do
   puts "running all tests"
 end

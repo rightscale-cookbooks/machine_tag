@@ -20,7 +20,7 @@
 require "spec_helper"
 
 describe Chef::Resource::MachineTag do
-  let(:resource) { Chef::Resource::MachineTag.new('machine_tag', run_context) }
+  let(:resource) { Chef::Resource::MachineTag.new('namespace:predicate=value', run_context) }
   let(:events) { Chef::EventDispatch::Dispatcher.new }
   let(:run_context) { Chef::RunContext.new(node, {}, events) }
   let(:node) { Chef::Node.new }
@@ -42,7 +42,7 @@ describe Chef::Resource::MachineTag do
       ]
       valid_tags.each do |tag|
         resource.name(tag)
-        resource.name.should == tag
+        expect(resource.name).to eq tag
       end
     end
   end

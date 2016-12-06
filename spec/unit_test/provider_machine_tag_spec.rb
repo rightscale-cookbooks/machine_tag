@@ -22,7 +22,7 @@ require "spec_helper"
 describe Chef::Provider::MachineTag do
   let(:provider) do
     provider = Chef::Provider::MachineTag.new(new_resource, run_context)
-    provider.stub(:get_helper).and_return(helper_stub)
+    allow(provider).to receive(:get_helper).and_return(helper_stub)
     provider
   end
 
@@ -45,12 +45,12 @@ describe Chef::Provider::MachineTag do
     end
 
     it "should create a tag" do
-      helper_stub.should_receive(:create).with(tag)
+      expect(helper_stub).to receive(:create).with(tag)
       provider.run_action(:create)
     end
 
     it "should delete a tag" do
-      helper_stub.should_receive(:delete).with(tag)
+      expect(helper_stub).to receive(:delete).with(tag)
       provider.run_action(:delete)
     end
   end

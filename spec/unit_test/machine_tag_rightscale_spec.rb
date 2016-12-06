@@ -71,32 +71,32 @@ describe Chef::MachineTagRightscale do
 
   describe "#create" do
     it "should create a tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--add', 'some:tag=true')
+      allow(tag_helper).to receive(:run_rs_tag_util).with('--add', 'some:tag=true')
       tag_helper.create('some:tag=true')
     end
   end
 
   describe "#delete" do
     it "should delete a tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--remove', 'some:tag=true')
+      allow(tag_helper).to receive(:run_rs_tag_util).with('--remove', 'some:tag=true')
       tag_helper.delete('some:tag=true')
     end
   end
 
   describe "#list" do
     it "should list the tags in the server" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--list').and_return(rs_list_result)
+      allow(tag_helper).to receive(:run_rs_tag_util).with('--list').and_return(rs_list_result)
       tag_helper.list
     end
   end
 
   describe "#do_query" do
     it "should return an array of tag sets containing the query tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--query', 'database:active=true').and_return(rs_raw_output)
+      allow(tag_helper).to receive(:run_rs_tag_util).with('--query', 'database:active=true').and_return(rs_raw_output)
 
       tags = tag_helper.send(:do_query, ['database:active=true'])
-      tags.should be_a(Array)
-      tags.first.should be_a(MachineTag::Set)
+      expect(tags).to be_a(Array)
+      expect(tags.first).to be_a(MachineTag::Set)
 
       expected_output = [
         MachineTag::Set[
@@ -121,7 +121,7 @@ describe Chef::MachineTagRightscale do
         ]
       ]
 
-      tags.should == expected_output
+      expect(tags).to eq expected_output
     end
   end
 end

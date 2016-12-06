@@ -25,7 +25,7 @@ describe Chef::MachineTagBase do
   let(:base) { Chef::MachineTagBase.new }
 
   before do
-    Kernel.stub(:sleep) {|seconds| seconds}
+    allow(Kernel).to receive(:sleep) {|seconds| seconds}
   end
 
   describe '#search' do
@@ -44,17 +44,17 @@ describe Chef::MachineTagBase do
 
     context 'when no query options are specified' do
       it 'should do a query and return the tags matching the query' do
-        base.should_receive(:do_query).with(['database:active=true'],{}).and_return([tag_set])
+        allow(base).to receive(:do_query).with(['database:active=true'],{}).and_return([tag_set])
 
         search_output = base.search('database:active=true')
-        search_output.should == [tag_set]
+        expect(search_output).to eq [tag_set]
 
-        base.should_receive(:do_query).with([
+        allow(base).to receive(:do_query).with([
           'database:active=true', 'rs_monitoring:state=active'
         ],{}).and_return([tag_set])
 
         search_output = base.search(['database:active=true', 'rs_monitoring:state=active'])
-        search_output.should == [tag_set]
+        expect(search_output).to eq [tag_set]
       end
     end
 
@@ -65,7 +65,7 @@ describe Chef::MachineTagBase do
           # initially, but appears in the query sometime later
           tag_set_partial = tag_set.union(['database:master=true'])
           tag_set_full = tag_set_partial.union(['database:repl=active'])
-          base.should_receive(:do_query).with(['database:active=true'],{:required_tags=>["database:master=true", "database:repl=active"]}).exactly(4).and_return(
+          allow(base).to receive(:do_query).with(['database:active=true'],{:required_tags=>["database:master=true", "database:repl=active"]}).exactly(4).and_return(
             [tag_set],
             [tag_set_partial],
             [tag_set_partial],
@@ -76,7 +76,7 @@ describe Chef::MachineTagBase do
             required_tags: ['database:master=true', 'database:repl=active']
           }
           search_output = base.search('database:active=true', query_options)
-          search_output.should == [tag_set_full]
+          expect(search_output).to eq [tag_set_full]
         end
       end
 
@@ -89,7 +89,7 @@ describe Chef::MachineTagBase do
             query_timeout: 1,
           }
 
-          base.should_receive(:do_query).with([query_tag],query_options).at_least(:once).and_return([tag_set])
+          allow(base).to receive(:do_query).with([query_tag],query_options).at_least(:once).and_return([tag_set])
 
           expect do
             base.search('database:active=true', query_options)
@@ -102,13 +102,13 @@ describe Chef::MachineTagBase do
   describe '#sleep_interval' do
     it "should return interval less than or equal to #{MAX_SLEEP_INTERVAL} seconds" do
       interval = base.send(:sleep_interval, 1)
-      interval.should eq(2)
+      expect(interval).to eq(2)
 
       interval = base.send(:sleep_interval, 4)
-      interval.should eq(16)
+      expect(interval).to eq(16)
 
       interval = base.send(:sleep_interval, 80)
-      interval.should == MAX_SLEEP_INTERVAL
+      expect(interval).to eq MAX_SLEEP_INTERVAL
     end
   end
 
@@ -122,7 +122,7 @@ describe Chef::MachineTagBase do
         'server:something',
       ]
       valid_tags.each do |tag|
-        base.send(:valid_tag_query?, MachineTag::Tag.new(tag)).should be_truthy
+        expect(base.send(:valid_tag_query?, MachineTag::Tag.new(tag))).to be_truthy
       end
 
       invalid_tags = [
@@ -133,7 +133,7 @@ describe Chef::MachineTagBase do
         'n- :blah =!',
       ]
       invalid_tags.each do |tag|
-        base.send(:valid_tag_query?, MachineTag::Tag.new(tag)).should be_falsey
+        expect(base.send(:valid_tag_query?, MachineTag::Tag.new(tag))).to be_falsey
       end
     end
   end
@@ -162,7 +162,7 @@ describe Chef::MachineTagBase do
     context 'tag is not found in the array of tag sets' do
       it 'should return an empty array' do
         output_array = base.send(:detect_tag, tag_set_array, 'some:state=*')
-        output_array.should be_empty
+        expect(output_array).to be_empty
       end
     end
   end
