@@ -20,6 +20,12 @@
 log "Installing 'machine_tag' gem"
 include_recipe 'build-essential'
 
-chef_gem 'machine_tag'
+chef_gem 'machine_tag' do
+  compile_time true
+  action :install
+end
 
-chef_gem 'right_api_client'
+chef_gem 'right_api_client' do
+  compile_time true
+  action :install
+end
