@@ -6,8 +6,8 @@ before_install:
 - gem install bundler -v 1.11.2
 install:
 - chef exec bundle install --jobs=3 --retry=3
-before_script: chef exec bundle exec rake setup_test_environment
-script: chef exec bundle exec rake except_kitchen
+before_script: chef exec rake setup_test_environment
+script: chef exec rake except_kitchen
 notifications:
   slack:
     secure: O3w/D2xUxgWwKY6aRiLP0KvRnUDXS7t9bGzQELo+d6KxGXRhf3mo32FeKKI2MdIVnZJf+nV+/5eIskH7VtcaW+EgS71npLs4NQBrqM5TR3J0gkRoYXGvH8f7VgXtHc3NbrHwc2eCLsacEam4BFHlJQqACRfWLbnS/186gEoLb3o=
