@@ -14,10 +14,10 @@ provisioner:
 platforms:
 - name: centos-6.8
   driver_config:
-    box: bento/centos-6.7
+    box: bento/centos-6.8
 - name: centos-7.0
   driver_config:
-    box: bento/centos-7.0
+    box: bento/centos-7.2
 - name: rhel-6.5
   driver_config:
     box: local-rhel-6.5
