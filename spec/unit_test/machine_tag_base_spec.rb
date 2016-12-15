@@ -25,7 +25,7 @@ describe Chef::MachineTagBase do
   let(:base) { Chef::MachineTagBase.new }
 
   before do
-    allow(Kernel).to receive(:sleep) {|seconds| seconds}
+    allow(Kernel).to receive(:sleep) { |seconds| seconds }
   end
 
   describe '#search' do
@@ -44,14 +44,14 @@ describe Chef::MachineTagBase do
 
     context 'when no query options are specified' do
       it 'should do a query and return the tags matching the query' do
-        allow(base).to receive(:do_query).with(['database:active=true'],{}).and_return([tag_set])
+        allow(base).to receive(:do_query).with(['database:active=true'], {}).and_return([tag_set])
 
         search_output = base.search('database:active=true')
         expect(search_output).to eq [tag_set]
 
         allow(base).to receive(:do_query).with([
-          'database:active=true', 'rs_monitoring:state=active'
-        ],{}).and_return([tag_set])
+                                                 'database:active=true', 'rs_monitoring:state=active'
+                                               ], {}).and_return([tag_set])
 
         search_output = base.search(['database:active=true', 'rs_monitoring:state=active'])
         expect(search_output).to eq [tag_set]
@@ -65,11 +65,11 @@ describe Chef::MachineTagBase do
           # initially, but appears in the query sometime later
           tag_set_partial = tag_set.union(['database:master=true'])
           tag_set_full = tag_set_partial.union(['database:repl=active'])
-          allow(base).to receive(:do_query).with(['database:active=true'],{:required_tags=>["database:master=true", "database:repl=active"]}).exactly(4).and_return(
+          allow(base).to receive(:do_query).with(['database:active=true'], required_tags: ['database:master=true', 'database:repl=active']).exactly(4).and_return(
             [tag_set],
             [tag_set_partial],
             [tag_set_partial],
-            [tag_set_full],
+            [tag_set_full]
           )
 
           query_options = {
@@ -86,10 +86,10 @@ describe Chef::MachineTagBase do
 
           query_options = {
             required_tags: ['database:master=true'],
-            query_timeout: 1,
+            query_timeout: 1
           }
 
-          allow(base).to receive(:do_query).with([query_tag],query_options).at_least(:once).and_return([tag_set])
+          allow(base).to receive(:do_query).with([query_tag], query_options).at_least(:once).and_return([tag_set])
 
           expect do
             base.search('database:active=true', query_options)
@@ -119,7 +119,7 @@ describe Chef::MachineTagBase do
         'namespace:predicate=*',
         'n_0abc123:xy_123=-1',
         'naMesPacE:PrEdiCatE=value=value',
-        'server:something',
+        'server:something'
       ]
       valid_tags.each do |tag|
         expect(base.send(:valid_tag_query?, MachineTag::Tag.new(tag))).to be_truthy
@@ -130,7 +130,7 @@ describe Chef::MachineTagBase do
         'namespace:pred*',
         'n*:predicate',
         'namespace:predicate=val*',
-        'n- :blah =!',
+        'n- :blah =!'
       ]
       invalid_tags.each do |tag|
         expect(base.send(:valid_tag_query?, MachineTag::Tag.new(tag))).to be_falsey
@@ -142,7 +142,7 @@ describe Chef::MachineTagBase do
     let(:tag_set_array) do
       [
         MachineTag::Set['rs_login:state=true', 'rs_monitoring:state=active'],
-        MachineTag::Set['rs_login:state=restricted'],
+        MachineTag::Set['rs_login:state=restricted']
       ]
     end
 

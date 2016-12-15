@@ -21,11 +21,11 @@ class Chef::Resource::RubyBlock
   include Chef::MachineTagHelper
 end
 
-ruby_block "searching master tags" do
+ruby_block 'searching master tags' do
   block do
-    master_tags = tag_search(node, "master:ip").first
-    Chef::Log.info "Master IP: " + master_tags["master:ip"].first.value
-    Chef::Log.info "Master Hostname: " + master_tags["master", "hostname"].first.value
-    Chef::Log.info "Master Login State: " + master_tags["master:login"].first.value
+    master_tags = tag_search(node, 'master:ip').first
+    Chef::Log.info 'Master IP: ' + master_tags['master:ip'].first.value
+    Chef::Log.info 'Master Hostname: ' + master_tags['master', 'hostname'].first.value
+    Chef::Log.info 'Master Login State: ' + master_tags['master:login'].first.value
   end
 end

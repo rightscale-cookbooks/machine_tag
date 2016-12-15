@@ -40,15 +40,15 @@ class Chef
       begin
         require 'machine_tag'
       rescue LoadError => e
-        raise e, "'machine_tag' gem is not installed!" +
-          " Run the 'machine_tag::default' recipe first to install this gem."
+        raise e, "'machine_tag' gem is not installed!" \
+                 " Run the 'machine_tag::default' recipe first to install this gem."
       end
-      
+
       if shell_out('which', 'rs_tag').exitstatus == 0
         # This is a RightScale environment
         Chef::MachineTagRightscale.new
       elsif shell_out('which', 'rightlink').exitstatus == 0 &&
-          shell_out('rightlink', '-version').stdout =~ /^RightLink 10/
+            shell_out('rightlink', '-version').stdout =~ /^RightLink 10/
         # This is a RightLink 10 environment
         Chef::MachineTagRl10.new
       elsif node['cloud'] && node['cloud']['provider'] == 'vagrant'
@@ -56,11 +56,9 @@ class Chef
         hostname, cache_dir = vagrant_params_from_node(node)
         Chef::MachineTagVagrant.new(hostname, cache_dir)
       else
-        raise "Could not detect a supported machine tag environment."
+        raise 'Could not detect a supported machine tag environment.'
       end
     end
-
-    private
 
     # Harvests Vagrant parameters from the chef node.
     #
@@ -73,14 +71,14 @@ class Chef
       arg_error("node['hostname'] not defined.") unless node['hostname']
 
       # Verify machine_tag hash
-      arg_error("node['machine_tag'] hash not defined.") unless node.has_key?('machine_tag')
+      arg_error("node['machine_tag'] hash not defined.") unless node.key?('machine_tag')
 
       # Verify cache_dir
       unless node['machine_tag']['vagrant_tag_cache_dir']
         arg_error("node['machine_tag']['vagrant_tag_cache_dir'] not defined.")
       end
 
-      return node['hostname'], node['machine_tag']['vagrant_tag_cache_dir']
+      [node['hostname'], node['machine_tag']['vagrant_tag_cache_dir']]
     end
 
     # Raises an `ArgumentError` with a custom error message.
@@ -90,7 +88,6 @@ class Chef
     def self.arg_error(message)
       raise ArgumentError, message + " Please see the README file in the 'machine_tag' cookbook."
     end
-
   end
 
   module MachineTagHelper

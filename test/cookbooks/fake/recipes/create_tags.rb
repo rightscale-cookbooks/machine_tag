@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-ip_addr = node['cloud']['public_ips'][0] if (node['cloud'] && node['cloud']['public_ips'])
+ip_addr = node['cloud']['public_ips'][0] if node['cloud'] && node['cloud']['public_ips']
 ip_addr ||= node['ipaddress']
 
 machine_tag "master:ip=#{ip_addr}" do
@@ -28,4 +28,4 @@ machine_tag "master:hostname=#{node['hostname']}" do
   action :create
 end
 
-machine_tag "master:login=restricted"
+machine_tag 'master:login=restricted'

@@ -25,7 +25,7 @@ class Chef
   class MachineTagVagrant < MachineTagBase
     # File in the VM where machine tags will be stored
     #
-    TAGS_JSON_FILE = 'tags.json' unless const_defined?(:TAGS_JSON_FILE)
+    TAGS_JSON_FILE = 'tags.json'.freeze unless const_defined?(:TAGS_JSON_FILE)
 
     # Creates a tag on the VM by adding the tag to its tags cache file
     # if it does not exist.
@@ -66,7 +66,7 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the tags on the VMs that match the query
     #
-    def do_query(query_tags, options = {})
+    def do_query(query_tags, _options = {})
       query_result = []
 
       # Return empty array if no tags are found in the query string
@@ -75,16 +75,15 @@ class Chef
       # Query all VMs for the tags
       all_vm_tag_dirs.each do |tag_dir|
         tags_array = read_tag_file(::File.join(tag_dir, TAGS_JSON_FILE))
-        if tags_array
-          tags_set_array = [::MachineTag::Set.new(tags_array)]
+        next unless tags_array
+        tags_set_array = [::MachineTag::Set.new(tags_array)]
 
-          # If at least one of the tags in the query is found in the VM
-          # select the VM
-          query_tags.each do |tag|
-            unless detect_tag(tags_set_array, tag).empty?
-              query_result += tags_set_array
-              break
-            end
+        # If at least one of the tags in the query is found in the VM
+        # select the VM
+        query_tags.each do |tag|
+          unless detect_tag(tags_set_array, tag).empty?
+            query_result += tags_set_array
+            break
           end
         end
       end
@@ -114,11 +113,11 @@ class Chef
     #
     # @param block [Proc] the block to be executed before updating tag cache directory
     #
-    def update_tag_file(&block)
+    def update_tag_file
       make_cache_dir
       begin
         tag_array = read_tag_file(@tag_file)
-        block.call(tag_array)
+        yield(tag_array)
         write_tag_file(tag_array)
       end
     end

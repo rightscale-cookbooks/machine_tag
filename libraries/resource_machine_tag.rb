@@ -22,7 +22,6 @@ require 'chef/resource'
 class Chef
   class Resource
     class MachineTag < Chef::Resource
-
       def initialize(name, run_context = nil)
         super
         @resource_name = :machine_tag
@@ -42,11 +41,10 @@ class Chef
         set_or_return(
           :name,
           arg,
-          :kind_of => String,
-          :regex => /^#{::MachineTag::NAMESPACE_AND_PREDICATE}=(?<value>\*|[^*]+)$/
+          kind_of: String,
+          regex: /^#{::MachineTag::NAMESPACE_AND_PREDICATE}=(?<value>\*|[^*]+)$/
         )
       end
-
     end
   end
 end

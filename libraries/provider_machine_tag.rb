@@ -42,7 +42,7 @@ class Chef
       #
       def action_create
         status = @tag_helper.create(new_resource.name)
-        Chef::Log.info "Created tag '#{new_resource.name}'"
+        Chef::Log.info "Created tag '#{new_resource.name}', Status: #{status}"
         new_resource.updated_by_last_action(true)
       end
 
@@ -50,7 +50,7 @@ class Chef
       #
       def action_delete
         status = @tag_helper.delete(new_resource.name)
-        Chef::Log.info "Deleted tag '#{new_resource.name}'"
+        Chef::Log.info "Deleted tag '#{new_resource.name}', Status: #{status}"
         new_resource.updated_by_last_action(true)
       end
 
@@ -65,7 +65,6 @@ class Chef
       def get_helper(node)
         Chef::MachineTag.factory(node)
       end
-
     end
   end
 end

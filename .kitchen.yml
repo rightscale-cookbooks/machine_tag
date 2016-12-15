@@ -2,19 +2,22 @@
 driver_plugin: vagrant
 driver_config:
   customize:
-    cpus: 2
-    memory: 1024
+    cpus: 1
+    memory: 512
+  ssh:
+    insert_key: false
 
 provisioner:
-  name: chef_solo
+  name: chef_zero
+  always_update_cookbooks: true
 
 platforms:
-- name: centos-6.7
+- name: centos-6.8
   driver_config:
-    box: opscode-centos-6.7
+    box: bento/centos-6.7
 - name: centos-7.0
   driver_config:
-    box: opscode-centos-7.0
+    box: bento/centos-7.0
 - name: rhel-6.5
   driver_config:
     box: local-rhel-6.5
@@ -25,10 +28,10 @@ platforms:
     box_url: file://<%= File.expand_path('~') %>/opscode_rhel-7.0_chef-provisionerless.box
 - name: ubuntu-12.04
   driver_config:
-    box: opscode-ubuntu-12.04
+    box: bento/ubuntu-12.04
 - name: ubuntu-14.04
   driver_config:
-    box: opscode-ubuntu-14.04
+    box: bento/ubuntu-14.04
 
 suites:
 - name: default

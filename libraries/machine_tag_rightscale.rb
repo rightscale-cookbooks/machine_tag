@@ -24,7 +24,6 @@ require 'chef/mixin/shell_out'
 
 class Chef
   class MachineTagRightscale < MachineTagBase
-
     include Chef::Mixin::ShellOut
 
     # Creates a tag on the server.
@@ -32,7 +31,7 @@ class Chef
     # @param tag [String] the tag to be created
     #
     def create(tag)
-      run_rs_tag_util("--add", tag)
+      run_rs_tag_util('--add', tag)
     end
 
     # Deletes a tag from the server.
@@ -40,7 +39,7 @@ class Chef
     # @param tag [String] the tag to be deleted
     #
     def delete(tag)
-      run_rs_tag_util("--remove", tag)
+      run_rs_tag_util('--remove', tag)
     end
 
     # Lists all tags on the server.
@@ -48,9 +47,8 @@ class Chef
     # @return [MachineTag::Set] the tags on the server
     #
     def list
-      ::MachineTag::Set.new(JSON.parse(run_rs_tag_util("--list")))
+      ::MachineTag::Set.new(JSON.parse(run_rs_tag_util('--list')))
     end
-
 
     protected
 
@@ -60,8 +58,8 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
-    def do_query(query_tags, options = {})
-      tags_hash = JSON.parse(run_rs_tag_util("--query", query_tags.join(' ')))
+    def do_query(query_tags, _options = {})
+      tags_hash = JSON.parse(run_rs_tag_util('--query', query_tags.join(' ')))
       tags_set_array = []
       tags_hash.values.each do |value|
         tags_set_array << ::MachineTag::Set.new(value['tags'])

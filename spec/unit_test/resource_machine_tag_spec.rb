@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Chef::Resource::MachineTag do
   let(:resource) { Chef::Resource::MachineTag.new('namespace:predicate=value', run_context) }
@@ -25,8 +25,8 @@ describe Chef::Resource::MachineTag do
   let(:run_context) { Chef::RunContext.new(node, {}, events) }
   let(:node) { Chef::Node.new }
 
-  context "tag syntax is valid" do
-    it "has a name attribute to set the name of the tag" do
+  context 'tag syntax is valid' do
+    it 'has a name attribute to set the name of the tag' do
       valid_tags = [                         # VALID TAGS
         'namespace:predicate=value',         # standard format
         'namespace:predicate=val ue',        # space in value
@@ -47,8 +47,8 @@ describe Chef::Resource::MachineTag do
     end
   end
 
-  context "tag syntax is invalid" do
-    it "should raise error" do
+  context 'tag syntax is invalid' do
+    it 'should raise error' do
       invalid_tags = [                       # INVALID TAGS
         '_namespace:_predicate=value',       # don't allow leading '_'
         'namespace:pred*',                   # don't allow '*' in predicate

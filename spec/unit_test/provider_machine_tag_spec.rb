@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Chef::Provider::MachineTag do
   let(:provider) do
@@ -44,12 +44,12 @@ describe Chef::Provider::MachineTag do
       provider.load_current_resource
     end
 
-    it "should create a tag" do
+    it 'should create a tag' do
       expect(helper_stub).to receive(:create).with(tag)
       provider.run_action(:create)
     end
 
-    it "should delete a tag" do
+    it 'should delete a tag' do
       expect(helper_stub).to receive(:delete).with(tag)
       provider.run_action(:delete)
     end

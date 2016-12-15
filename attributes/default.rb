@@ -17,5 +17,5 @@
 # limitations under the License.
 #
 
-default['machine_tag']['vagrant_tag_cache_dir'] = "/vagrant/cache_dir/machine_tag_cache/"
-default['build-essential']['compile_time'] = true 
+default['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/cache_dir/machine_tag_cache/'
+default['build-essential']['compile_time'] = true

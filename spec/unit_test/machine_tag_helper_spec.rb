@@ -51,12 +51,12 @@ describe Chef::MachineTagHelper do
 
       options = {
         required_tags: ['foo:bar'],
-        query_timeout: 5,
+        query_timeout: 5
       }
 
       allow(env_stub).to receive(:search).with(query_tag, options).and_return([tag_set])
       tags = Chef::MachineTagHelper.tag_search(node, query_tag, options)
-      expect(tags).to  be_instance_of(Array)
+      expect(tags).to be_instance_of(Array)
       expect(tags.first).to be_instance_of(MachineTag::Set)
       expect(tags.first).to eq(tag_set)
 

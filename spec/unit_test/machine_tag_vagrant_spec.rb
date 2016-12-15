@@ -52,7 +52,7 @@ describe Chef::MachineTagVagrant do
 
   let(:tag_helper) { Chef::MachineTagVagrant.new('somehost', '/vagrant/machine_tag_cache/') }
 
-  describe "public methods" do
+  describe 'public methods' do
     let(:tags_array) { JSON.parse(local_tags) }
 
     before(:each) do
@@ -60,9 +60,9 @@ describe Chef::MachineTagVagrant do
       allow(tag_helper).to receive(:read_tag_file).and_return(tags_array)
     end
 
-    describe "#create" do
-      context "tag to be created does not already exist" do
-        it "should create a tag" do
+    describe '#create' do
+      context 'tag to be created does not already exist' do
+        it 'should create a tag' do
           tag = 'test:tags=foo'
 
           allow(tag_helper).to receive(:write_tag_file).with(tags_array.push(tag))
@@ -72,8 +72,8 @@ describe Chef::MachineTagVagrant do
         end
       end
 
-      context "tag to be created already exists" do
-        it "should not create a duplicate tag" do
+      context 'tag to be created already exists' do
+        it 'should not create a duplicate tag' do
           allow(tag_helper).to receive(:write_tag_file).with(tags_array)
           tag_helper.create('appserver:active=true')
 
@@ -82,9 +82,9 @@ describe Chef::MachineTagVagrant do
       end
     end
 
-    describe "#delete" do
-      context "tag to be deleted exists" do
-        it "should delete a tag" do
+    describe '#delete' do
+      context 'tag to be deleted exists' do
+        it 'should delete a tag' do
           tag = 'appserver:active=true'
           tags_array.delete(tag)
           allow(tag_helper).to receive(:write_tag_file).with(tags_array)
@@ -95,20 +95,20 @@ describe Chef::MachineTagVagrant do
       end
     end
 
-    describe "#list" do
-      it "should list tags" do
+    describe '#list' do
+      it 'should list tags' do
         expect(tag_helper.list['rs_login:state'].first).to eq 'rs_login:state=restricted'
       end
     end
 
-    describe "#do_query" do
+    describe '#do_query' do
       before(:each) do
-        allow(tag_helper).to receive(:all_vm_tag_dirs).and_return(["/tmp/master", "/tmp/slave"])
+        allow(tag_helper).to receive(:all_vm_tag_dirs).and_return(['/tmp/master', '/tmp/slave'])
         allow(tag_helper).to receive(:read_tag_file).and_return(JSON.parse(remote_tags))
       end
 
-      context "query tag exists in the system" do
-        it "should return array of tag sets containing the query tag" do
+      context 'query tag exists in the system' do
+        it 'should return array of tag sets containing the query tag' do
           tags = tag_helper.send(:do_query, ['server:private_ip_0'])
           expect(tags).to be_a(Array)
           expect(tags.first).to be_a(MachineTag::Set)
@@ -118,8 +118,8 @@ describe Chef::MachineTagVagrant do
         end
       end
 
-      context "query tag does not exist in the system" do
-        it "should return empty array" do
+      context 'query tag does not exist in the system' do
+        it 'should return empty array' do
           tags = tag_helper.send(:do_query, ['server:something=*'])
           expect(tags).to be_a(Array)
           expect(tags).to be_empty
@@ -128,9 +128,9 @@ describe Chef::MachineTagVagrant do
     end
   end
 
-  describe "private methods" do
-    describe "#update_tag_file" do
-      it "should update tag json file" do
+  describe 'private methods' do
+    describe '#update_tag_file' do
+      it 'should update tag json file' do
         tags_array = JSON.parse(remote_tags)
         tag = 'create:some=tag'
 
@@ -144,9 +144,9 @@ describe Chef::MachineTagVagrant do
       end
     end
 
-    describe "#make_cache_dir" do
-      context "cache directory does not exist" do
-        it "should create tag cache dir" do
+    describe '#make_cache_dir' do
+      context 'cache directory does not exist' do
+        it 'should create tag cache dir' do
           expect(File).to receive(:directory?).and_return(false)
           expect(FileUtils).to receive(:mkdir_p).with('/vagrant/machine_tag_cache/somehost')
 
@@ -154,8 +154,8 @@ describe Chef::MachineTagVagrant do
         end
       end
 
-      context "cache directory exists" do
-        it "should not create tag cache dir" do
+      context 'cache directory exists' do
+        it 'should not create tag cache dir' do
           expect(File).to receive(:directory?).and_return(true)
           expect(FileUtils).to_not receive(:mkdir_p)
 
@@ -164,19 +164,19 @@ describe Chef::MachineTagVagrant do
       end
     end
 
-    describe "#read_tag_file" do
-      context "tag file exists in the cache directory" do
-        it "should return the tags array from the file" do
+    describe '#read_tag_file' do
+      context 'tag file exists in the cache directory' do
+        it 'should return the tags array from the file' do
           expect(File).to receive(:exist?).and_return(true)
           expect(File).to receive(:read).and_return(local_tags)
 
           tags = tag_helper.send(:read_tag_file, 'something')
-          expect(tags).to_not  be_empty
+          expect(tags).to_not be_empty
         end
       end
 
-      context "tag file does not exist in the cache directory" do
-        it "should return an empty array" do
+      context 'tag file does not exist in the cache directory' do
+        it 'should return an empty array' do
           expect(File).to receive(:exist?).and_return(false)
 
           tags = tag_helper.send(:read_tag_file, 'something')
