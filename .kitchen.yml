@@ -11,6 +11,8 @@ provisioner:
   name: chef_zero
   always_update_cookbooks: true
   require_chef_omnibus: 12.16.42
+  log_level: debug
+  log_file: /var/log/chef-solo.log
 
 platforms:
 - name: centos-6.8
@@ -19,17 +21,18 @@ platforms:
 - name: centos-7.0
   driver_config:
     box: bento/centos-7.2
-- name: rhel-6.5
-  driver_config:
-    box: local-rhel-6.5
-    box_url: file://<%= File.expand_path('~') %>/opscode_rhel-6.5_chef-provisionerless.box
-- name: rhel-7.0
-  driver_config:
-    box: local-rhel-7.0
-    box_url: file://<%= File.expand_path('~') %>/opscode_rhel-7.0_chef-provisionerless.box
+#- name: rhel-6.5
+#  driver_config:
+#    box: local-rhel-6.5
+#    box_url: file://<%= File.expand_path('~') %>/opscode_rhel-6.5_chef-provisionerless.box
+#- name: rhel-7.0
+#  driver_config:
+#    box: local-rhel-7.0
+#    box_url: file://<%= File.expand_path('~') %>/opscode_rhel-7.0_chef-provisionerless.box
 - name: ubuntu-12.04
   driver_config:
     box: bento/ubuntu-12.04
+  run_list: ['recipe[apt]']
 - name: ubuntu-14.04
   driver_config:
     box: bento/ubuntu-14.04
@@ -42,11 +45,16 @@ suites:
   run_list:
   - recipe[machine_tag]
   - recipe[fake]
+  attributes:
+    apt:
+      compile_time_update: true
 - name: create
   run_list:
   - recipe[machine_tag]
   - recipe[fake::create_tags]
   attributes:
+    apt:
+      compile_time_update: true
     cloud:
       provider: vagrant
 - name: delete
@@ -55,6 +63,8 @@ suites:
   - recipe[fake::create_tags]
   - recipe[fake::delete_tags]
   attributes:
+    apt:
+      compile_time_update: true
     cloud:
       provider: vagrant
 - name: list
@@ -63,19 +73,17 @@ suites:
   - recipe[fake::create_tags]
   - recipe[fake::list_tags]
   attributes:
+    apt:
+      compile_time_update: true
     cloud:
       provider: vagrant
-  provisioner:
-    solo_rb:
-      log_location: /var/log/chef-solo.log
 - name: search
   run_list:
   - recipe[machine_tag]
   - recipe[fake::create_tags]
   - recipe[fake::search_tags]
   attributes:
+    apt:
+      compile_time_update: true
     cloud:
-      provider: vagrant
-  provisioner:
-    solo_rb:
-      log_location: /var/log/chef-solo.log
+      provider: vagrant 
