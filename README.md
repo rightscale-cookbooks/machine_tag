@@ -9,7 +9,7 @@
 [travis]: https://travis-ci.org/rightscale-cookbooks/machine_tag
 
 This cookbook provides a `machine_tag` resource that can create, delete, list, and
-search [machine tags][Tagging] in the Vagrant and RightScale environments. 
+search [machine tags][Tagging] in the Vagrant and RightScale environments.
 
 Github Repository: [https://github.com/rightscale-cookbooks/machine_tag](https://github.com/rightscale-cookbooks/machine_tag)
 
@@ -18,11 +18,12 @@ Github Repository: [https://github.com/rightscale-cookbooks/machine_tag](https:/
 # Requirements
 
  * [machine_tag] gem which provides a library for using machine tags.
- * Requires Ruby 1.9 or higher
+ * Requires Ruby 2.3.1
+ * Chef 12
  * Requires [RightLink 10](http://docs.rightscale.com/rl10/) See cookbook version 1.0.9 for RightLink 6 support
  * Platform
-   * Ubuntu 12.04
-   * CentOS 6
+   * Ubuntu 12.04, 14.04
+   * CentOS 6, 7
 
 [machine_tag]: https://rubygems.org/gems/machine_tag
 
@@ -69,7 +70,7 @@ RightScale managed VM to have the required access to the [rs_tag utility][rs_tag
 For using this resource in a *RightScale Environment*, the system must be a
 RightScale managed VM to have the required access to the right_api_client
 with proxy_mode for instance_tokens, the scope is now limited to
-operational instances in the same cloud as the VM making the call. 
+operational instances in the same cloud as the VM making the call.
 
 # Usage
 

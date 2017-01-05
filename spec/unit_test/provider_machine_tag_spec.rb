@@ -17,12 +17,12 @@
 # limitations under the License.
 #
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Chef::Provider::MachineTag do
   let(:provider) do
     provider = Chef::Provider::MachineTag.new(new_resource, run_context)
-    provider.stub(:get_helper).and_return(helper_stub)
+    allow(provider).to receive(:get_helper).and_return(helper_stub)
     provider
   end
 
@@ -31,8 +31,8 @@ describe Chef::Provider::MachineTag do
   let(:run_context) { Chef::RunContext.new(node, {}, events) }
   let(:node) do
     node = Chef::Node.new
-    node.set['hostname'] = 'some_host'
-    node.set['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/machine_tag_cache/'
+    node.default['hostname'] = 'some_host'
+    node.default['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/machine_tag_cache/'
     node
   end
   let(:tag) { 'namespace:predicate=value' }
@@ -44,13 +44,13 @@ describe Chef::Provider::MachineTag do
       provider.load_current_resource
     end
 
-    it "should create a tag" do
-      helper_stub.should_receive(:create).with(tag)
+    it 'should create a tag' do
+      expect(helper_stub).to receive(:create).with(tag)
       provider.run_action(:create)
     end
 
-    it "should delete a tag" do
-      helper_stub.should_receive(:delete).with(tag)
+    it 'should delete a tag' do
+      expect(helper_stub).to receive(:delete).with(tag)
       provider.run_action(:delete)
     end
   end

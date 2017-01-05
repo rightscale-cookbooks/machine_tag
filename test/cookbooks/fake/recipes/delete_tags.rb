@@ -17,6 +17,6 @@
 # limitations under the License.
 #
 
-machine_tag "master:login=restricted" do
+machine_tag 'master:login=restricted' do
   action :delete
 end

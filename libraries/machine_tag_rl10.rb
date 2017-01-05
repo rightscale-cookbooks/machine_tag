@@ -24,18 +24,17 @@ require 'chef/mixin/shell_out'
 
 class Chef
   class MachineTagRl10 < MachineTagBase
-
     include Chef::Mixin::ShellOut
 
     def initialize_api_client
-      require "right_api_client"
-      RightApi::Client.new(:rl10 => true)
+      require 'right_api_client'
+      RightApi::Client.new(rl10: true)
     end
-    
+
     def api_client
       @api_client = initialize_api_client
     end
-    
+
     # Creates a tag on the server.
     #
     # @param tag [String] the tag to be created
@@ -49,7 +48,7 @@ class Chef
     # @param tag [String] the tag to be deleted
     #
     def delete(tag)
-      api_client.tags.multi_delete(resource_hrefs: [api_client.get_instance.href], tags: [tag]) 
+      api_client.tags.multi_delete(resource_hrefs: [api_client.get_instance.href], tags: [tag])
     end
 
     # Lists all tags on the server.
@@ -57,11 +56,10 @@ class Chef
     # @return [MachineTag::Set] the tags on the server
     #
     def list
-      tags = api_client.tags.by_resource(resource_hrefs: 
+      tags = api_client.tags.by_resource(resource_hrefs:
           [api_client.get_instance.href]).first.tags
-      ::MachineTag::Set.new(tags.map{|tag| tag["name"]})
+      ::MachineTag::Set.new(tags.map { |tag| tag['name'] })
     end
-
 
     protected
 
@@ -72,7 +70,7 @@ class Chef
     # @return [Array<MachineTag::Set>] the tags on the servers that match the query
     #
     def do_query(query_tags, options = {})
-      query_tags = [query_tags] if query_tags.kind_of?(String)
+      query_tags = [query_tags] if query_tags.is_a?(String)
       Chef::Log.info "Tagged query_tags: #{query_tags}"
       match_all = options.fetch(:match_all, false)
       resources = api_client.tags.by_tag(resource_type: 'instances', tags: query_tags, match_all: match_all)
@@ -83,15 +81,13 @@ class Chef
         links = resources.first.links
         if links
           links.each do |link|
-            Chef::Log.info "Tagged Resource Cloud:#{link["href"].split('/')[0..3].join('/')}"
-            if api_client.get_instance.show.cloud.href == link["href"].split('/')[0..3].join('/')
-              if api_client.resource(link["href"]).state == 'operational'
-                resource_tags = api_client.tags.by_resource(resource_hrefs:[link["href"]])#.first.tags
-                tags_hash[link["href"]]={
-                  "tags"=> resource_tags.first.tags.map{|tag| tag["name"]}
-                }
-              end
-            end
+            Chef::Log.info "Tagged Resource Cloud:#{link['href'].split('/')[0..3].join('/')}"
+            next unless api_client.get_instance.show.cloud.href == link['href'].split('/')[0..3].join('/')
+            next unless api_client.resource(link['href']).state == 'operational'
+            resource_tags = api_client.tags.by_resource(resource_hrefs: [link['href']]) # .first.tags
+            tags_hash[link['href']] = {
+              'tags' => resource_tags.first.tags.map { |tag| tag['name'] }
+            }
           end
         end
       end

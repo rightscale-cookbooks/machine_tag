@@ -19,7 +19,6 @@
 
 class Chef
   class MachineTagBase
-
     # Default query timeout (in seconds)
     #
     DEFAULT_QUERY_TIMEOUT = 120 unless const_defined?(:DEFAULT_QUERY_TIMEOUT)
@@ -32,7 +31,7 @@ class Chef
     #
     # @param tag [String] the tag to create
     #
-    def create(tag)
+    def create(_tag)
       not_implemented
     end
 
@@ -40,7 +39,7 @@ class Chef
     #
     # @param tag [String] the tag to delete
     #
-    def delete(tag)
+    def delete(_tag)
       not_implemented
     end
 
@@ -66,8 +65,8 @@ class Chef
     # @raise [Timeout::Error] if the required tags could not be found within the time
     #
     def search(query_tags, options = {})
-      query_tags = [query_tags] if query_tags.kind_of?(String)
-      tags_set_array = do_query(query_tags,options)
+      query_tags = [query_tags] if query_tags.is_a?(String)
+      tags_set_array = do_query(query_tags, options)
 
       unless options[:required_tags].nil? || options[:required_tags].empty?
         # Set timeout for querying for required_tags. By default, the timeout is set
@@ -75,7 +74,7 @@ class Chef
         query_timeout = options[:query_timeout] ? options[:query_timeout] : DEFAULT_QUERY_TIMEOUT
 
         begin
-          Timeout::timeout(query_timeout) do
+          Timeout.timeout(query_timeout) do
             options[:required_tags].each do |tag|
               sleep_sec = 1
               # Check if the tag is found in all the servers in the query result. If not, re-query
@@ -86,7 +85,7 @@ class Chef
                 Kernel.sleep(sleep_sec)
 
                 Chef::Log.info "Re-querying for '#{tag}'..."
-                tags_set_array = do_query(query_tags,options)
+                tags_set_array = do_query(query_tags, options)
               end
             end
           end
@@ -97,7 +96,6 @@ class Chef
       tags_set_array
     end
 
-
     protected
 
     # Queries for a specific tag on all servers and returns all the tags on the servers
@@ -107,7 +105,7 @@ class Chef
     #
     # @return [Array<MachineTag::Set>] the list of all tags on the servers that match the query
     #
-    def do_query(query_tags,options = {})
+    def do_query(_query_tags, _options = {})
       not_implemented
     end
 
@@ -176,14 +174,13 @@ class Chef
       [delay * delay, MAX_SLEEP_INTERVAL].min
     end
 
-
     # Raises an error if the method called is not implemented in the class.
     #
     # @raise [NotImplementedError] if the method call is not implemented
     #
     def not_implemented
       caller[0] =~ /`(.*?)'/
-      raise NotImplementedError, "#{$1} is not implemented on #{self.class}"
+      raise NotImplementedError, "#{Regexp.last_match(1)} is not implemented on #{self.class}"
     end
   end
 end

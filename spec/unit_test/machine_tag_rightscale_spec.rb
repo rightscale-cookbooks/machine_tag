@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Chef::MachineTagRightscale do
-
   let(:rs_raw_output) do
     <<-EOF
       {
@@ -69,59 +68,59 @@ describe Chef::MachineTagRightscale do
 
   let(:tag_helper) { Chef::MachineTagRightscale.new }
 
-  describe "#create" do
-    it "should create a tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--add', 'some:tag=true')
+  describe '#create' do
+    it 'should create a tag' do
+      allow(tag_helper).to receive(:run_rs_tag_util).with('--add', 'some:tag=true')
       tag_helper.create('some:tag=true')
     end
   end
 
-  describe "#delete" do
-    it "should delete a tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--remove', 'some:tag=true')
+  describe '#delete' do
+    it 'should delete a tag' do
+      allow(tag_helper).to receive(:run_rs_tag_util).with('--remove', 'some:tag=true')
       tag_helper.delete('some:tag=true')
     end
   end
 
-  describe "#list" do
-    it "should list the tags in the server" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--list').and_return(rs_list_result)
+  describe '#list' do
+    it 'should list the tags in the server' do
+      allow(tag_helper).to receive(:run_rs_tag_util).with('--list').and_return(rs_list_result)
       tag_helper.list
     end
   end
 
-  describe "#do_query" do
-    it "should return an array of tag sets containing the query tag" do
-      tag_helper.should_receive(:run_rs_tag_util).with('--query', 'database:active=true').and_return(rs_raw_output)
+  describe '#do_query' do
+    it 'should return an array of tag sets containing the query tag' do
+      allow(tag_helper).to receive(:run_rs_tag_util).with('--query', 'database:active=true').and_return(rs_raw_output)
 
       tags = tag_helper.send(:do_query, ['database:active=true'])
-      tags.should be_a(Array)
-      tags.first.should be_a(MachineTag::Set)
+      expect(tags).to be_a(Array)
+      expect(tags.first).to be_a(MachineTag::Set)
 
       expected_output = [
         MachineTag::Set[
-          "database:active=true",
-          "rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT",
-          "rs_login:state=restricted",
-          "rs_monitoring:state=active",
-          "server:private_ip_0=10.100.0.12",
-          "server:public_ip_0=157.56.165.202",
-          "server:uuid=01-83PJQDO8911IT"
+          'database:active=true',
+          'rs_dbrepl:slave_instance_uuid=01-83PJQDO8911IT',
+          'rs_login:state=restricted',
+          'rs_monitoring:state=active',
+          'server:private_ip_0=10.100.0.12',
+          'server:public_ip_0=157.56.165.202',
+          'server:uuid=01-83PJQDO8911IT'
         ],
         MachineTag::Set[
-          "database:active=true",
-          "rs_dbrepl:master_active=20130604215532-mylineage",
-          "rs_dbrepl:master_instance_uuid=01-25MQ0VQKKDUVQ",
-          "rs_login:state=restricted",
-          "rs_monitoring:state=active",
-          "server:private_ip_0=10.100.0.18",
-          "server:public_ip_0=157.56.165.204",
-          "server:uuid=01-25MQ0VQKKDUVQ",
-          "terminator:discovery_time=Tue Jun 04 22:07:07 +0000 2013"
+          'database:active=true',
+          'rs_dbrepl:master_active=20130604215532-mylineage',
+          'rs_dbrepl:master_instance_uuid=01-25MQ0VQKKDUVQ',
+          'rs_login:state=restricted',
+          'rs_monitoring:state=active',
+          'server:private_ip_0=10.100.0.18',
+          'server:public_ip_0=157.56.165.204',
+          'server:uuid=01-25MQ0VQKKDUVQ',
+          'terminator:discovery_time=Tue Jun 04 22:07:07 +0000 2013'
         ]
       ]
 
-      tags.should == expected_output
+      expect(tags).to eq expected_output
     end
   end
 end

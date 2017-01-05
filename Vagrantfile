@@ -1,25 +1,25 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
+Vagrant.configure('2') do |config|
   # All Vagrant configuration is done here. The most common configuration
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
-  #config.vm.hostname = "machine-tag-berkshelf"
+  # config.vm.hostname = "machine-tag-berkshelf"
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "opscode-ubuntu-12.04"
+  config.vm.box = 'opscode-ubuntu-12.04'
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_provisionerless.box"
+  config.vm.box_url = 'https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_provisionerless.box'
 
   # Assign this VM to a host-only network IP, allowing you to access it
   # via the IP. Host-only networks can talk to the host machine as well as
   # any other machines on the same network, but cannot be accessed (through this
   # network interface) by any external networks.
-  #config.vm.network :private_network, ip: "33.33.33.10"
+  # config.vm.network :private_network, ip: "33.33.33.10"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -71,52 +71,52 @@ Vagrant.configure("2") do |config|
 
   # Master DB
   config.vm.define :master do |master|
-    master.vm.network :private_network, ip: "33.33.33.10"
+    master.vm.network :private_network, ip: '33.33.33.10'
 
     # This must be unique for tags to work on Vagrant
-    master.vm.hostname = "machine-tag-berkshelf-master"
+    master.vm.hostname = 'machine-tag-berkshelf-master'
 
     master.vm.provision :chef_solo do |chef|
       chef.json = {
         :mysql => {
-          :server_root_password => 'rootpass',
-          :server_debian_password => 'debpass',
-          :server_repl_password => 'replpass'
+          server_root_password: 'rootpass',
+          server_debian_password: 'debpass',
+          server_repl_password: 'replpass'
         },
         'rs-db' => {
           'application' => { 'password' => 'apppass' }
-        },
+        }
       }
       chef.run_list = [
-        "recipe[machine_tag]",
-        "recipe[fake::create_tags]",
-        "recipe[fake::list_tags]"
+        'recipe[machine_tag]',
+        'recipe[fake::create_tags]',
+        'recipe[fake::list_tags]'
       ]
     end
   end
 
   # Slave DB
   config.vm.define :slave do |slave|
-    slave.vm.network :private_network, ip: "33.33.33.11"
+    slave.vm.network :private_network, ip: '33.33.33.11'
 
     # This must be unique for tags to work on Vagrant
-    slave.vm.hostname = "machine-tag-berkshelf-slave"
+    slave.vm.hostname = 'machine-tag-berkshelf-slave'
 
     slave.vm.provision :chef_solo do |chef|
       chef.json = {
         :mysql => {
-          :server_root_password => 'rootpass',
-          :server_debian_password => 'debpass',
-          :server_repl_password => 'replpass'
+          server_root_password: 'rootpass',
+          server_debian_password: 'debpass',
+          server_repl_password: 'replpass'
         },
         'rs-db' => {
           'application' => { 'password' => 'apppass' }
-        },
+        }
       }
       chef.run_list = [
-        "recipe[machine_tag]",
-        "recipe[fake::search_tags]",
-        "recipe[fake::delete_tags]"
+        'recipe[machine_tag]',
+        'recipe[fake::search_tags]',
+        'recipe[fake::delete_tags]'
       ]
     end
   end

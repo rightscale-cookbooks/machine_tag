@@ -18,10 +18,11 @@
 #
 
 lib = File.expand_path('../../libraries', __FILE__)
-$:.unshift(lib) unless $:.include?(lib)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'chefspec'
 require 'machine_tag_helper'
 require 'provider_machine_tag'
 require 'resource_machine_tag'
 require 'machine_tag'
+ChefSpec::Coverage.start!

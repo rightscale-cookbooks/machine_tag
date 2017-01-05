@@ -21,7 +21,7 @@ class Chef::Resource::RubyBlock
   include Chef::MachineTagHelper
 end
 
-ruby_block "listing master tags" do
+ruby_block 'listing master tags' do
   block do
     tags_list = tag_list(node)
     Chef::Log.info tags_list.inspect
