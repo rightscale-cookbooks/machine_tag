@@ -41,7 +41,7 @@ task :verify_version do
   end
 
   puts `git rev-parse --abbrev-ref HEAD`.strip
-  if `git rev-parse --abbrev-ref HEAD`.strip != 'master'
+  if `git rev-parse --abbrev-ref HEAD`.strip != ('master'&&'HEAD')
     old_version = get_old_version.tr('\'', '')
     new_version = get_new_version.tr('\'', '')
     puts "Verifying Metdata Version - Old:#{old_version}, New:#{new_version}"
