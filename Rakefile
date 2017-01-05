@@ -40,6 +40,7 @@ task :verify_version do
     @new_version
   end
 
+  puts `git rev-parse --abbrev-ref HEAD`.strip
   if `git rev-parse --abbrev-ref HEAD`.strip != 'master'
     old_version = get_old_version.tr('\'', '')
     new_version = get_new_version.tr('\'', '')
