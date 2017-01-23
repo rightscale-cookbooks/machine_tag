@@ -2,6 +2,11 @@ machine_tag Cookbook CHANGELOG
 =======================
 
 This file is used to list changes made in each version of the machine_tag cookbook.
+
+v2.0.1
+------
+- pinning right_api_client to 1.6.2, because 1.6.3 requires json(2)
+
 v2.0.0
 ------
 - Add support for Chef 12

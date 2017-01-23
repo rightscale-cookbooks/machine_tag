@@ -26,6 +26,7 @@ chef_gem 'machine_tag' do
 end
 
 chef_gem 'right_api_client' do
+  version node['machine_tag']['right_api_client']['gem_version']
   compile_time true
   action :install
 end
