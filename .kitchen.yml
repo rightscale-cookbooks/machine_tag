@@ -18,7 +18,7 @@ platforms:
 - name: centos-6.8
   driver_config:
     box: bento/centos-6.8
-- name: centos-7.0
+- name: centos-7.2
   driver_config:
     box: bento/centos-7.2
 #- name: rhel-6.5
@@ -86,4 +86,4 @@ suites:
     apt:
       compile_time_update: true
     cloud:
-      provider: vagrant 
+      provider: vagrant
