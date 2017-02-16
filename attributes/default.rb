@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: machine_tag
 # Attributes:: default
@@ -19,4 +20,4 @@
 
 default['machine_tag']['vagrant_tag_cache_dir'] = '/vagrant/cache_dir/machine_tag_cache/'
 default['build-essential']['compile_time'] = true
-default['machine_tag']['right_api_client']['gem_version'] = '1.6.2'
+default['machine_tag']['right_api_client']['gem_version'] = (Gem::Requirement.new('>= 12.18').satisfied_by?(Gem::Version.new(Chef::VERSION)) ? '1.6.3' : '1.6.2')
