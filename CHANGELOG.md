@@ -3,6 +3,10 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v2.0.3
+------
+- adding a matcher for cookbook test
+
 v2.0.2
 ------
 - adding in support for chef 12.18
