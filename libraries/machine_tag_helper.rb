@@ -51,7 +51,7 @@ class Chef
             shell_out('rightlink', '-version').stdout =~ /^RightLink 10/
         # This is a RightLink 10 environment
         Chef::MachineTagRl10.new
-      elsif node['cloud'] && node['cloud']['provider'] == 'vagrant'
+      elsif ( node['cloud'] && node['cloud']['provider'] == 'vagrant' ) || docker?(node)
         # This is a Vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
         Chef::MachineTagVagrant.new(hostname, cache_dir)
