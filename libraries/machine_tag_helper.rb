@@ -20,6 +20,9 @@
 require_relative 'machine_tag_rightscale'
 require_relative 'machine_tag_rl10'
 require_relative 'machine_tag_vagrant'
+require 'chef/sugar'
+
+include Chef::Sugar::Docker
 
 require 'chef/mixin/shell_out'
 

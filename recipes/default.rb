@@ -30,3 +30,5 @@ chef_gem 'right_api_client' do
   compile_time true
   action :install
 end
+
+include_recipe 'chef-sugar'
