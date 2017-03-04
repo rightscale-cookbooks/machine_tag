@@ -20,9 +20,7 @@
 require_relative 'machine_tag_rightscale'
 require_relative 'machine_tag_rl10'
 require_relative 'machine_tag_vagrant'
-require 'chef/sugar'
 
-include Chef::Sugar::Docker
 
 require 'chef/mixin/shell_out'
 
@@ -46,7 +44,7 @@ class Chef
         raise e, "'machine_tag' gem is not installed!" \
                  " Run the 'machine_tag::default' recipe first to install this gem."
       end
-
+      require 'chef/sugar'
       if shell_out('which', 'rs_tag').exitstatus == 0
         # This is a RightScale environment
         Chef::MachineTagRightscale.new
@@ -54,7 +52,7 @@ class Chef
             shell_out('rightlink', '-version').stdout =~ /^RightLink 10/
         # This is a RightLink 10 environment
         Chef::MachineTagRl10.new
-      elsif ( node['cloud'] && node['cloud']['provider'] == 'vagrant' ) || docker?(node)
+      elsif ( node['cloud'] && node['cloud']['provider'] == 'vagrant' ) || Chef::Sugar::Docker.docker?(node)
         # This is a Vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
         Chef::MachineTagVagrant.new(hostname, cache_dir)
