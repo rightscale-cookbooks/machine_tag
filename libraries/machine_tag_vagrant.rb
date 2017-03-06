@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: machine_tag
 # Library:: machine_tag_vagrant
@@ -25,7 +26,7 @@ class Chef
   class MachineTagVagrant < MachineTagBase
     # File in the VM where machine tags will be stored
     #
-    TAGS_JSON_FILE = 'tags.json'.freeze unless const_defined?(:TAGS_JSON_FILE)
+    TAGS_JSON_FILE = 'tags.json' unless const_defined?(:TAGS_JSON_FILE)
 
     # Creates a tag on the VM by adding the tag to its tags cache file
     # if it does not exist.

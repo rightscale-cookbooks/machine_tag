@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: machine_tag
 # Spec:: machine_tag_helper_spec
@@ -51,7 +52,7 @@ describe Chef::MachineTagHelper do
 
       options = {
         required_tags: ['foo:bar'],
-        query_timeout: 5
+        query_timeout: 5,
       }
 
       allow(env_stub).to receive(:search).with(query_tag, options).and_return([tag_set])

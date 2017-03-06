@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: machine_tag
 # Library:: machine_tag_rightscale
@@ -86,7 +87,7 @@ class Chef
             next unless api_client.resource(link['href']).state == 'operational'
             resource_tags = api_client.tags.by_resource(resource_hrefs: [link['href']]) # .first.tags
             tags_hash[link['href']] = {
-              'tags' => resource_tags.first.tags.map { |tag| tag['name'] }
+              'tags' => resource_tags.first.tags.map { |tag| tag['name'] },
             }
           end
         end

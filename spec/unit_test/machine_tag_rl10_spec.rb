@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: machine_tag
 # Spec:: machine_tag_rightscale_spec
@@ -53,7 +54,7 @@ describe Chef::MachineTagRl10 do
       { 'name' => 'rs_monitoring:state=active' },
       { 'name' => 'server:private_ip_0=10.254.84.76' },
       { 'name' => 'server:public_ip_0=54.214.187.99' },
-      { 'name' => 'server:uuid=01-6P781RDGU1F13' }
+      { 'name' => 'server:uuid=01-6P781RDGU1F13' },
     ]
   end
 
