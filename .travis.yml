@@ -28,6 +28,18 @@ env:
     - INSTANCE=create-ubuntu-1204
     - INSTANCE=create-centos-6
     - INSTANCE=create-centos-7
+    - INSTANCE=delete-ubuntu-1404
+    - INSTANCE=delete-ubuntu-1204
+    - INSTANCE=delete-centos-6
+    - INSTANCE=delete-centos-7
+    - INSTANCE=list-ubuntu-1404
+    - INSTANCE=list-ubuntu-1204
+    - INSTANCE=list-centos-6
+    - INSTANCE=list-centos-7
+    - INSTANCE=search-ubuntu-1404
+    - INSTANCE=search-ubuntu-1204
+    - INSTANCE=search-centos-6
+    - INSTANCE=search-centos-7
 before_script:
   - sudo iptables -L DOCKER || ( echo "DOCKER iptables chain missing" ; sudo iptables -N DOCKER )
   - eval "$(/opt/chefdk/bin/chef shell-init bash)"
