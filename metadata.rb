@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 name             'machine_tag'
 maintainer       'RightScale, Inc.'
 maintainer_email 'cookbooks@rightscale.com'

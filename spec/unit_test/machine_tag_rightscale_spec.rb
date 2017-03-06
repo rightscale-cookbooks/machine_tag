@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: machine_tag
 # Spec:: machine_tag_rightscale_spec
@@ -117,7 +118,7 @@ describe Chef::MachineTagRightscale do
           'server:public_ip_0=157.56.165.204',
           'server:uuid=01-25MQ0VQKKDUVQ',
           'terminator:discovery_time=Tue Jun 04 22:07:07 +0000 2013'
-        ]
+        ],
       ]
 
       expect(tags).to eq expected_output

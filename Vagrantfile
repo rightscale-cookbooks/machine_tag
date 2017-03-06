@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -81,16 +82,16 @@ Vagrant.configure('2') do |config|
         :mysql => {
           server_root_password: 'rootpass',
           server_debian_password: 'debpass',
-          server_repl_password: 'replpass'
+          server_repl_password: 'replpass',
         },
         'rs-db' => {
-          'application' => { 'password' => 'apppass' }
-        }
+          'application' => { 'password' => 'apppass' },
+        },
       }
       chef.run_list = [
         'recipe[machine_tag]',
         'recipe[fake::create_tags]',
-        'recipe[fake::list_tags]'
+        'recipe[fake::list_tags]',
       ]
     end
   end
@@ -107,16 +108,16 @@ Vagrant.configure('2') do |config|
         :mysql => {
           server_root_password: 'rootpass',
           server_debian_password: 'debpass',
-          server_repl_password: 'replpass'
+          server_repl_password: 'replpass',
         },
         'rs-db' => {
-          'application' => { 'password' => 'apppass' }
-        }
+          'application' => { 'password' => 'apppass' },
+        },
       }
       chef.run_list = [
         'recipe[machine_tag]',
         'recipe[fake::search_tags]',
-        'recipe[fake::delete_tags]'
+        'recipe[fake::delete_tags]',
       ]
     end
   end

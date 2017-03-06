@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: machine_tag
 # Spec:: machine_tag_base_spec
@@ -73,7 +74,7 @@ describe Chef::MachineTagBase do
           )
 
           query_options = {
-            required_tags: ['database:master=true', 'database:repl=active']
+            required_tags: ['database:master=true', 'database:repl=active'],
           }
           search_output = base.search('database:active=true', query_options)
           expect(search_output).to eq [tag_set_full]
@@ -86,7 +87,7 @@ describe Chef::MachineTagBase do
 
           query_options = {
             required_tags: ['database:master=true'],
-            query_timeout: 1
+            query_timeout: 1,
           }
 
           allow(base).to receive(:do_query).with([query_tag], query_options).at_least(:once).and_return([tag_set])
@@ -119,7 +120,7 @@ describe Chef::MachineTagBase do
         'namespace:predicate=*',
         'n_0abc123:xy_123=-1',
         'naMesPacE:PrEdiCatE=value=value',
-        'server:something'
+        'server:something',
       ]
       valid_tags.each do |tag|
         expect(base.send(:valid_tag_query?, MachineTag::Tag.new(tag))).to be_truthy
@@ -130,7 +131,7 @@ describe Chef::MachineTagBase do
         'namespace:pred*',
         'n*:predicate',
         'namespace:predicate=val*',
-        'n- :blah =!'
+        'n- :blah =!',
       ]
       invalid_tags.each do |tag|
         expect(base.send(:valid_tag_query?, MachineTag::Tag.new(tag))).to be_falsey
@@ -142,7 +143,7 @@ describe Chef::MachineTagBase do
     let(:tag_set_array) do
       [
         MachineTag::Set['rs_login:state=true', 'rs_monitoring:state=active'],
-        MachineTag::Set['rs_login:state=restricted']
+        MachineTag::Set['rs_login:state=restricted'],
       ]
     end
 

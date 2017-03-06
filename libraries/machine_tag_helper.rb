@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: machine_tag
 # Library:: machine_tag_helper
@@ -20,7 +21,6 @@
 require_relative 'machine_tag_rightscale'
 require_relative 'machine_tag_rl10'
 require_relative 'machine_tag_vagrant'
-
 
 require 'chef/mixin/shell_out'
 
@@ -52,7 +52,7 @@ class Chef
             shell_out('rightlink', '-version').stdout =~ /^RightLink 10/
         # This is a RightLink 10 environment
         Chef::MachineTagRl10.new
-      elsif ( node['cloud'] && node['cloud']['provider'] == 'vagrant' ) || Chef::Sugar::Docker.docker?(node)
+      elsif (node['cloud'] && node['cloud']['provider'] == 'vagrant') || Chef::Sugar::Docker.docker?(node)
         # This is a Vagrant environment
         hostname, cache_dir = vagrant_params_from_node(node)
         Chef::MachineTagVagrant.new(hostname, cache_dir)

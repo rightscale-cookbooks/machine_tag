@@ -1,0 +1,131 @@
+driver:
+  name: dokken
+  privileged: true # because Docker and SystemD/Upstart
+  chef_version: 12.16.42
+
+transport:
+  name: dokken
+
+provisioner:
+  name: dokken
+
+verifier:
+  name: inspec
+
+platforms:
+- name: debian-8
+  driver:
+    image: debian:8
+    pid_one_command: /bin/systemd
+    intermediate_instructions:
+      - RUN /usr/bin/apt-get update
+      - RUN /usr/bin/apt-get install apt-transport-https lsb-release procps net-tools -y
+
+- name: centos-6
+  driver:
+    image: centos:6
+    platform: rhel
+    pid_one_command: /sbin/init
+    intermediate_instructions:
+      - RUN yum -y install which initscripts net-tools wget
+
+- name: centos-7
+  driver:
+    image: centos:7
+    platform: rhel
+    pid_one_command: /usr/lib/systemd/systemd
+    intermediate_instructions:
+      - RUN yum -y install lsof which systemd-sysv initscripts wget net-tools
+
+- name: fedora-latest
+  driver:
+    image: fedora:latest
+    pid_one_command: /usr/lib/systemd/systemd
+    intermediate_instructions:
+      - RUN dnf -y install yum which systemd-sysv initscripts wget net-tools
+
+- name: ubuntu-12.04
+  driver:
+    image: ubuntu-upstart:12.04
+    pid_one_command: /sbin/init
+    intermediate_instructions:
+      - RUN /usr/bin/apt-get update
+      - RUN /usr/bin/apt-get install apt-transport-https lsb-release procps net-tools -y
+
+- name: ubuntu-14.04
+  driver:
+    image: ubuntu-upstart:14.04
+    pid_one_command: /sbin/init
+    intermediate_instructions:
+      - RUN /usr/bin/apt-get update
+      - RUN /usr/bin/apt-get install apt-transport-https lsb-release procps net-tools -y
+
+- name: ubuntu-16.04
+  driver:
+    image: ubuntu:16.04
+    pid_one_command: /bin/systemd
+    intermediate_instructions:
+      - RUN /usr/bin/apt-get update
+      - RUN /usr/bin/apt-get install apt-transport-https lsb-release procps net-tools -y
+
+- name: opensuse-13.2
+  driver:
+    image: opensuse:13.2
+    pid_one_command: /bin/systemd
+    intermediate_instructions:
+      - RUN zypper --non-interactive install aaa_base perl-Getopt-Long-Descriptive which net-tools
+
+- name: opensuse-leap
+  driver:
+    image: opensuse:leap
+    pid_one_command: /bin/systemd
+    intermediate_instructions:
+      - RUN zypper --non-interactive install aaa_base perl-Getopt-Long-Descriptive which hostname
+#
+suites:
+- name: default
+  run_list:
+  - recipe[machine_tag]
+  - recipe[fake]
+  attributes:
+    apt:
+      compile_time_update: true
+- name: create
+  run_list:
+  - recipe[machine_tag]
+  - recipe[fake::create_tags]
+  attributes:
+    apt:
+      compile_time_update: true
+    cloud:
+      provider: vagrant
+- name: delete
+  run_list:
+  - recipe[machine_tag]
+  - recipe[fake::create_tags]
+  - recipe[fake::delete_tags]
+  attributes:
+    apt:
+      compile_time_update: true
+    cloud:
+      provider: vagrant
+- name: list
+  run_list:
+  - recipe[machine_tag]
+  - recipe[fake::create_tags]
+  - recipe[fake::list_tags]
+  attributes:
+    apt:
+      compile_time_update: true
+    cloud:
+      provider: vagrant
+- name: search
+  run_list:
+  - recipe[machine_tag]
+  - recipe[fake::create_tags]
+  - recipe[fake::search_tags]
+  attributes:
+    apt:
+      compile_time_update: true
+    cloud:
+      provider: vagrant
