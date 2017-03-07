@@ -3,6 +3,11 @@ machine_tag Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the machine_tag cookbook.
 
+v2.0.4
+------
+- Added docker support thru chef-sugar and vagrant provider
+- updated travis tests to use kitchen-dokken
+
 v2.0.3
 ------
 - adding a matcher for cookbook test
