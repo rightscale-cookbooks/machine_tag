@@ -8,6 +8,8 @@ transport:
 
 provisioner:
   name: dokken
+  chef_log_level: debug
+  chef_log_file: /var/log/chef-solo.log
 
 verifier:
   root_path: '/opt/verifier'
