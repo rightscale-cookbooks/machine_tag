@@ -5,3 +5,5 @@ AllCops:
 Style/AccessorMethodName:
   Exclude:
     - 'Rakefile'
+Style/MutableConstant:
+  Enabled: false
