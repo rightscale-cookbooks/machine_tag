@@ -9,7 +9,7 @@ version          '2.0.4'
 issues_url       'https://github.com/rightscale-cookbooks/machine_tag/issues' if respond_to?(:issues_url)
 source_url       'https://github.com/rightscale-cookbooks/machine_tag' if respond_to?(:source_url)
 chef_version     '>= 12.0' if respond_to?(:chef_version)
-supports 'ubuntu','centos'
+supports 'ubuntu'
 
 depends 'apt'
 depends 'build-essential'
