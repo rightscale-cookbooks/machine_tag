@@ -8,9 +8,13 @@ transport:
 
 provisioner:
   name: dokken
+  chef_log_level: debug
+  chef_log_file: /var/log/chef-solo.log
 
 verifier:
-  name: inspec
+  root_path: '/opt/verifier'
+  default_path: '/opt/verifier'
+  sudo: false
 
 platforms:
 - name: debian-8
